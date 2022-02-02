@@ -11,9 +11,9 @@ inputs:
     required: true
     default: "true"
   github-token:
-    description: "GitHub token to use, default is secrets.GITHUB_TOKEN"
+    description: "Override GitHub token, if necessary"
     required: true
-    default: "${{ secrets.GITHUB_TOKEN }}"
+    default: "${{ github.token }}"
 
 runs:
   using: "node12"

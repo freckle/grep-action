@@ -1,5 +1,6 @@
 import * as yaml from "js-yaml";
 import { Minimatch } from "minimatch";
+import { relative } from "path";
 
 import * as core from "@actions/core";
 import * as exec from "@actions/exec";
@@ -25,7 +26,8 @@ async function getFiles(
     });
   } else {
     const globber = await glob.create(pattern.paths.join("\n"));
-    return await globber.glob();
+    const paths = await globber.glob();
+    return paths.map((p) => relative(process.cwd(), p));
   }
 }
 

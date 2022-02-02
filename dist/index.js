@@ -118,7 +118,7 @@ function buildOutput(annotations) {
     if (annotationsCount > 50) {
         core.warning("Only 50 annotations will be added to Check");
     }
-    return { title: title, summary: summary, text: null, annotations: annotations.slice(0, 50) };
+    return { title: title, summary: summary, annotations: annotations.slice(0, 50) };
 }
 function listPullRequestFiles(client) {
     return __awaiter(this, void 0, void 0, function () {
@@ -314,11 +314,9 @@ function toAnnotation(pattern, result) {
                 path: result.path,
                 start_line: result.line,
                 end_line: result.line,
-                start_column: null,
-                end_column: null,
                 annotation_level: pattern.level,
                 message: pattern.message,
-                title: pattern.title,
+                title: pattern.title || "",
                 raw_details: result.input,
             };
         case "nomatch":
@@ -326,11 +324,9 @@ function toAnnotation(pattern, result) {
                 path: "unknown",
                 start_line: 0,
                 end_line: 0,
-                start_column: null,
-                end_column: null,
                 annotation_level: "notice",
                 message: "Grep output not parsable: ".concat(result.message),
-                title: null,
+                title: "",
                 raw_details: result.input,
             };
     }

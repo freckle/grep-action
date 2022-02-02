@@ -198,6 +198,7 @@ function grep(args) {
                                     stdout += data.toString();
                                 },
                             },
+                            ignoreReturnCode: true,
                         })];
                 case 1:
                     _a.sent();
@@ -345,7 +346,7 @@ function run() {
                     token = core.getInput("github-token", { required: true });
                     patterns = config.loadPatterns(core.getInput("patterns", { required: true }));
                     onlyChanged = core.getInput("only-changed", { required: true }).toUpperCase() == "TRUE";
-                    core.info("patterns: ".concat(patterns.map(function (p) { return p.pattern; }).join(", ")));
+                    core.info("patterns: [".concat(patterns.map(function (p) { return p.pattern.toString(); }).join(", "), "]"));
                     core.info("only-changed: ".concat(onlyChanged));
                     core.endGroup();
                     client = github.getClient(token);
@@ -366,11 +367,11 @@ function run() {
                         return __generator(this, function (_c) {
                             switch (_c.label) {
                                 case 0:
-                                    core.startGroup(pattern.pattern);
+                                    core.startGroup("grep \"".concat(pattern.pattern, "\""));
                                     return [4 /*yield*/, getFiles(onlyChanged, changedFiles, pattern)];
                                 case 1:
                                     files = _c.sent();
-                                    return [4 /*yield*/, (0, grep_1.grep)(files)];
+                                    return [4 /*yield*/, (0, grep_1.grep)([pattern.pattern].concat(files))];
                                 case 2:
                                     results = _c.sent();
                                     core.info("Grepped ".concat(files.length, " file(s) => ").concat(results.length, " result(s)"));

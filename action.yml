@@ -1,5 +1,8 @@
-name: grep
-description: Run grep and submit results, and additional details, as Annotations
+name: 'Grep'
+description: |
+  Run grep and submit results, and additional details, as Annotations
+author: 'Freckle'
+
 inputs:
   patterns:
     description: "String of Yaml describing a list of Patterns"
@@ -8,7 +11,7 @@ inputs:
     description: "Only operate on changed files"
     required: true
     default: "true"
-outputs: {}
+
 runs:
-  using: node12
-  main: dist/index.js
+  using: 'node12'
+  main: 'dist/index.js'

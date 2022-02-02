@@ -1,0 +1,5 @@
+restylers:
+  - prettier:
+      include:
+        - "src/**/*.ts"
+  - "*"

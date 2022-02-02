@@ -281,15 +281,16 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
+var minimatch_1 = __nccwpck_require__(3973);
+var path_1 = __nccwpck_require__(1017);
 var core = __nccwpck_require__(2186);
 var glob = __nccwpck_require__(8090);
-var minimatch_1 = __nccwpck_require__(3973);
 var config = __nccwpck_require__(88);
 var github = __nccwpck_require__(5928);
 var grep_1 = __nccwpck_require__(4938);
 function getFiles(onlyChanged, changedFiles, pattern) {
     return __awaiter(this, void 0, void 0, function () {
-        var matchers_1, globber;
+        var matchers_1, globber, paths;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
@@ -302,7 +303,9 @@ function getFiles(onlyChanged, changedFiles, pattern) {
                 case 2:
                     globber = _a.sent();
                     return [4 /*yield*/, globber.glob()];
-                case 3: return [2 /*return*/, _a.sent()];
+                case 3:
+                    paths = _a.sent();
+                    return [2 /*return*/, paths.map(function (p) { return (0, path_1.relative)(process.cwd(), p); })];
             }
         });
     });

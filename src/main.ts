@@ -1,8 +1,9 @@
+import * as yaml from "js-yaml";
+import { Minimatch } from "minimatch";
+
 import * as core from "@actions/core";
 import * as exec from "@actions/exec";
 import * as glob from "@actions/glob";
-import * as yaml from "js-yaml";
-import { Minimatch } from "minimatch";
 
 import type { Pattern } from "./config";
 import * as config from "./config";

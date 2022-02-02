@@ -61,15 +61,10 @@ async function run() {
   try {
     core.startGroup("Inputs");
 
-    const token =
-      core.getInput("token") ||
-      core.getInput("github-token") ||
-      process.env.GITHUB_TOKEN;
-
+    const token = core.getInput("github-token", { required: true });
     const patterns = config.loadPatterns(
       core.getInput("patterns", { required: true })
     );
-
     const onlyChanged =
       core.getInput("only-changed", { required: true }).toUpperCase() == "TRUE";
 

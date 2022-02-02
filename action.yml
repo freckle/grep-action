@@ -11,6 +11,10 @@ inputs:
     description: "Only operate on changed files"
     required: true
     default: "true"
+  github-token:
+    description: "GitHub token to use, default is secrets.GITHUB_TOKEN"
+    required: true
+    default: "${{ secrets.GITHUB_TOKEN }}"
 
 runs:
   using: 'node12'

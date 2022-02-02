@@ -11,21 +11,17 @@ export function getClient(token: string): ClientType {
 export type Output = {
   title: string;
   summary: string;
-  text: string | null;
-  annotations: Annotation[] | null;
-  //images
+  annotations: Annotation[];
 };
 
 export type Annotation = {
   path: string;
   start_line: number;
   end_line: number;
-  start_column: number | null;
-  end_column: number | null;
   annotation_level: AnnotationLevel;
   message: string;
-  title: string | null;
-  raw_details: string | null;
+  title: string;
+  raw_details: string;
 };
 
 export type AnnotationLevel = "notice" | "warning" | "failure";
@@ -63,7 +59,7 @@ function buildOutput(annotations: Annotation[]): Output {
     core.warning("Only 50 annotations will be added to Check");
   }
 
-  return { title, summary, text: null, annotations: annotations.slice(0, 50) };
+  return { title, summary, annotations: annotations.slice(0, 50) };
 }
 
 type ListFilesResponse =

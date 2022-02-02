@@ -35,11 +35,9 @@ function toAnnotation(pattern: Pattern, result: GrepResult): Annotation {
         path: result.path,
         start_line: result.line,
         end_line: result.line,
-        start_column: null,
-        end_column: null,
         annotation_level: pattern.level,
         message: pattern.message,
-        title: pattern.title,
+        title: pattern.title || "",
         raw_details: result.input,
       };
     case "nomatch":
@@ -47,11 +45,9 @@ function toAnnotation(pattern: Pattern, result: GrepResult): Annotation {
         path: "unknown",
         start_line: 0,
         end_line: 0,
-        start_column: null,
-        end_column: null,
         annotation_level: "notice",
         message: `Grep output not parsable: ${result.message}`,
-        title: null,
+        title: "",
         raw_details: result.input,
       };
   }

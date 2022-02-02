@@ -21,6 +21,7 @@ export async function grep(args: string[]): Promise<GrepResult[]> {
         stdout += data.toString();
       },
     },
+    ignoreReturnCode: true,
   });
 
   return parseGrep(stdout);

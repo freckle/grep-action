@@ -342,9 +342,7 @@ function run() {
                 case 0:
                     _b.trys.push([0, 9, , 10]);
                     core.startGroup("Inputs");
-                    token = core.getInput("token") ||
-                        core.getInput("github-token") ||
-                        process.env.GITHUB_TOKEN;
+                    token = core.getInput("github-token", { required: true });
                     patterns = config.loadPatterns(core.getInput("patterns", { required: true }));
                     onlyChanged = core.getInput("only-changed", { required: true }).toUpperCase() == "TRUE";
                     core.info("patterns: ".concat(patterns.map(function (p) { return p.pattern; }).join(", ")));

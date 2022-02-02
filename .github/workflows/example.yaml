@@ -1,0 +1,41 @@
+name: Example
+
+on:
+  pull_request:
+  push:
+    branches: main
+
+jobs:
+  grep:
+    runs-on: ubuntu-latest
+    steps:
+      - using: actions/checkout@v2
+      - using: ./
+        with:
+          patterns: |
+            - pattern: "\\bsetFailed\\b"
+              paths:
+                - "src/**.ts"
+
+              # https://docs.github.com/en/rest/reference/checks#update-a-check-run
+              # Fields match the properties of the annotations field
+
+              # Must be notice|warning|failure
+              annotation_level: warning
+
+              # Limit 64KB
+              message: |
+                This is a body that will be included in the annotation. It
+                should guide a developer who finds this annotation in their Pull
+                Request -- should they not use this function or code pattern?
+                Should they understand some nuance or trade-offs when using it?
+
+                It supports *markdown*.
+
+              # Limit 255 characters
+              title: "Looking for setFailed as an example"
+
+              # Limit 64KB
+              raw_details: "Some raw details, whatever that means"
+
+          only-changed: false

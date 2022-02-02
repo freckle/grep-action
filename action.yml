@@ -1,0 +1,14 @@
+name: grep
+description: Run grep and submit results, and additional details, as Annotations
+inputs:
+  patterns:
+    description: "String of Yaml describing a list of Patterns"
+    required: true
+  only-changed:
+    description: "Only operate on changed files"
+    required: true
+    default: "true"
+outputs: {}
+runs:
+  using: node12
+  main: dist/main.js

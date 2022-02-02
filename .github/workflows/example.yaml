@@ -9,8 +9,8 @@ jobs:
   grep:
     runs-on: ubuntu-latest
     steps:
-      - using: actions/checkout@v2
-      - using: ./
+      - uses: actions/checkout@v2
+      - uses: ./
         with:
           patterns: |
             - pattern: "\\bsetFailed\\b"

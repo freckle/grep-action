@@ -68,7 +68,9 @@ async function run() {
     const onlyChanged =
       core.getInput("only-changed", { required: true }).toUpperCase() == "TRUE";
 
-    core.info(`patterns: ${patterns.map((p) => p.pattern).join(", ")}`);
+    core.info(
+      `patterns: [${patterns.map((p) => p.pattern.toString()).join(", ")}]`
+    );
     core.info(`only-changed: ${onlyChanged}`);
     core.endGroup();
 
@@ -82,7 +84,7 @@ async function run() {
     let annotations = [];
 
     for (const pattern of patterns) {
-      core.startGroup(pattern.pattern);
+      core.startGroup(`grep "${pattern.pattern}"`);
       const files = await getFiles(onlyChanged, changedFiles, pattern);
       const results = await grep(files);
 

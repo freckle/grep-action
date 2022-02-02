@@ -280,13 +280,60 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.run = void 0;
 var core = __nccwpck_require__(2186);
 var glob = __nccwpck_require__(8090);
 var minimatch_1 = __nccwpck_require__(3973);
 var config = __nccwpck_require__(88);
 var github = __nccwpck_require__(5928);
 var grep_1 = __nccwpck_require__(4938);
+function getFiles(onlyChanged, changedFiles, pattern) {
+    return __awaiter(this, void 0, void 0, function () {
+        var matchers_1, globber;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    if (!onlyChanged) return [3 /*break*/, 1];
+                    matchers_1 = pattern.paths.map(function (p) { return new minimatch_1.Minimatch(p); });
+                    return [2 /*return*/, changedFiles.filter(function (file) {
+                            matchers_1.some(function (m) { return m.match(file); });
+                        })];
+                case 1: return [4 /*yield*/, glob.create(pattern.paths.join("\n"))];
+                case 2:
+                    globber = _a.sent();
+                    return [4 /*yield*/, globber.glob()];
+                case 3: return [2 /*return*/, _a.sent()];
+            }
+        });
+    });
+}
+function toAnnotation(pattern, result) {
+    switch (result.tag) {
+        case "match":
+            return {
+                path: result.path,
+                start_line: result.line,
+                end_line: result.line,
+                start_column: null,
+                end_column: null,
+                annotation_level: pattern.level,
+                message: pattern.message,
+                title: pattern.title,
+                raw_details: result.input,
+            };
+        case "nomatch":
+            return {
+                path: "unknown",
+                start_line: 0,
+                end_line: 0,
+                start_column: null,
+                end_column: null,
+                annotation_level: "notice",
+                message: "Grep output not parsable: ".concat(result.message),
+                title: null,
+                raw_details: result.input,
+            };
+    }
+}
 function run() {
     return __awaiter(this, void 0, void 0, function () {
         var token, patterns, onlyChanged, client, changedFiles, _a, annotations_1, _loop_1, _i, patterns_1, pattern, error_1;
@@ -375,55 +422,7 @@ function run() {
         });
     });
 }
-exports.run = run;
-function getFiles(onlyChanged, changedFiles, pattern) {
-    return __awaiter(this, void 0, void 0, function () {
-        var matchers_1, globber;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    if (!onlyChanged) return [3 /*break*/, 1];
-                    matchers_1 = pattern.paths.map(function (p) { return new minimatch_1.Minimatch(p); });
-                    return [2 /*return*/, changedFiles.filter(function (file) {
-                            matchers_1.some(function (m) { return m.match(file); });
-                        })];
-                case 1: return [4 /*yield*/, glob.create(pattern.paths.join("\n"))];
-                case 2:
-                    globber = _a.sent();
-                    return [4 /*yield*/, globber.glob()];
-                case 3: return [2 /*return*/, _a.sent()];
-            }
-        });
-    });
-}
-function toAnnotation(pattern, result) {
-    switch (result.tag) {
-        case "match":
-            return {
-                path: result.path,
-                start_line: result.line,
-                end_line: result.line,
-                start_column: null,
-                end_column: null,
-                annotation_level: pattern.level,
-                message: pattern.message,
-                title: pattern.title,
-                raw_details: result.input,
-            };
-        case "nomatch":
-            return {
-                path: "unknown",
-                start_line: 0,
-                end_line: 0,
-                start_column: null,
-                end_column: null,
-                annotation_level: "notice",
-                message: "Grep output not parsable: ".concat(result.message),
-                title: null,
-                raw_details: result.input,
-            };
-    }
-}
+run();
 
 
 /***/ }),

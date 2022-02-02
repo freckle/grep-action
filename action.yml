@@ -1,0 +1,20 @@
+name: "Grep"
+description: |
+  Run grep and submit results, and additional details, as Annotations
+author: "Freckle"
+inputs:
+  patterns:
+    description: "String of Yaml describing a list of Patterns"
+    required: true
+  only-changed:
+    description: "Only operate on changed files"
+    required: true
+    default: "true"
+  github-token:
+    description: "Override GitHub token, if necessary"
+    required: true
+    default: "${{ github.token }}"
+
+runs:
+  using: "node12"
+  main: "dist/index.js"

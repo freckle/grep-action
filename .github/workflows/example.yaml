@@ -17,23 +17,24 @@ jobs:
               paths:
                 - "src/**.ts"
 
-              # https://docs.github.com/en/rest/reference/checks#update-a-check-run
-              # Fields match the properties of the annotations field
-
               # Must be notice|warning|failure
-              annotation_level: warning
+              level: warning
+
+              # Limit 255 characters
+              title: "Use of setFailed is considered harmful"
 
               # Limit 64KB
               message: |
-                This is a body that will be included in the annotation. It
-                should guide a developer who finds this annotation in their Pull
-                Request -- should they not use this function or code pattern?
-                Should they understand some nuance or trade-offs when using it?
+                Imagine if setFailed was a dangerous function. This annotation
+                will highlight its usage in diffs.
 
-                It supports *markdown*.
+                And this body would describe why that is, what nuances or
+                trade-offs, the author should consider, and perhaps some options
+                to use instead.
 
-              # Limit 255 characters
-              title: "Looking for setFailed as an example"
+                This bit doesn't support markdown, sadly, but maybe someday?
+
+                https://github.community/t/checks-ability-to-include-markdown-in-line-annotations/14736/3
 
               # Limit 64KB
               raw_details: "Some raw details, whatever that means"

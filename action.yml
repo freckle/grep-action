@@ -1,8 +1,7 @@
-name: 'Grep'
+name: "Grep"
 description: |
   Run grep and submit results, and additional details, as Annotations
-author: 'Freckle'
-
+author: "Freckle"
 inputs:
   patterns:
     description: "String of Yaml describing a list of Patterns"
@@ -17,5 +16,5 @@ inputs:
     default: "${{ secrets.GITHUB_TOKEN }}"
 
 runs:
-  using: 'node12'
-  main: 'dist/index.js'
+  using: "node12"
+  main: "dist/index.js"

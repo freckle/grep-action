@@ -1,0 +1,42 @@
+name: Example
+
+on:
+  pull_request:
+  push:
+    branches: main
+
+jobs:
+  grep:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: ./
+        with:
+          patterns: |
+            - pattern: "\\bsetFailed\\b"
+              paths:
+                - "src/**.ts"
+
+              # Must be notice|warning|failure
+              level: warning
+
+              # Limit 255 characters
+              title: "Use of setFailed is considered harmful"
+
+              # Limit 64KB
+              message: |
+                Imagine if setFailed was a dangerous function. This annotation
+                will highlight its usage in diffs.
+
+                And this body would describe why that is, what nuances or
+                trade-offs, the author should consider, and perhaps some options
+                to use instead.
+
+                This bit doesn't support markdown, sadly, but maybe someday?
+
+                https://github.community/t/checks-ability-to-include-markdown-in-line-annotations/14736/3
+
+              # Limit 64KB
+              raw_details: "Some raw details, whatever that means"
+
+          only-changed: false

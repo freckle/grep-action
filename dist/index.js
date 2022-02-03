@@ -95,19 +95,21 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.listPullRequestFiles = exports.createCheck = exports.getClient = void 0;
 var core = __nccwpck_require__(2186);
 var github = __nccwpck_require__(5438);
+var MAX_ANNOTATIONS = 50;
 function getClient(token) {
     return github.getOctokit(token);
 }
 exports.getClient = getClient;
 function createCheck(client, name, annotations) {
+    var _a;
     return __awaiter(this, void 0, void 0, function () {
         var output, pullRequest, head_sha, status, failures, conclusion;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
+        return __generator(this, function (_b) {
+            switch (_b.label) {
                 case 0:
                     output = buildOutput(annotations);
                     pullRequest = github.context.payload.pull_request;
-                    head_sha = (pullRequest && pullRequest.head.sha) || github.context.sha;
+                    head_sha = (_a = pullRequest === null || pullRequest === void 0 ? void 0 : pullRequest.head.sha) !== null && _a !== void 0 ? _a : github.context.sha;
                     status = "completed";
                     failures = output.annotations.filter(function (a) {
                         return a.annotation_level === "failure";
@@ -115,7 +117,7 @@ function createCheck(client, name, annotations) {
                     conclusion = failures.length > 0 ? "failure" : "success";
                     return [4 /*yield*/, client.rest.checks.create(__assign(__assign({}, github.context.repo), { name: name, head_sha: head_sha, status: status, conclusion: conclusion, output: output }))];
                 case 1:
-                    _a.sent();
+                    _b.sent();
                     return [2 /*return*/];
             }
         });
@@ -126,10 +128,10 @@ function buildOutput(annotations) {
     var annotationsCount = annotations !== null ? annotations.length : 0;
     var title = "".concat(annotationsCount, " result(s) found by grep");
     var summary = "";
-    if (annotationsCount > 50) {
-        core.warning("Only 50 annotations will be added to Check");
+    if (annotationsCount > MAX_ANNOTATIONS) {
+        core.warning("Only ".concat(MAX_ANNOTATIONS, " annotations will be added to Check"));
     }
-    return { title: title, summary: summary, annotations: annotations.slice(0, 50) };
+    return { title: title, summary: summary, annotations: annotations.slice(0, MAX_ANNOTATIONS) };
 }
 function listPullRequestFiles(client) {
     return __awaiter(this, void 0, void 0, function () {
@@ -242,29 +244,24 @@ exports.grep = grep;
 // Exported for testing
 function parseGrep(stdout) {
     // TODO Naive newline split (no Windows)
-    return stdout.split("\n").map(parseGrepLine);
+    return stdout
+        .split("\n")
+        .map(parseGrepLine)
+        .filter(function (x) { return x !== null; });
 }
 exports.parseGrep = parseGrep;
 function parseGrepLine(input) {
     var regex = /^(?<path>[^:]+):(?<line>[0-9]+):.*$/;
     var match = input.match(regex);
     if (match === null) {
-        return {
-            tag: "nomatch",
-            input: input,
-            message: "\"".concat(input, "\" did not match"),
-        };
+        return null;
     }
     var path = match.groups.path;
     var line = parseInt(match.groups.line, 10);
     if (isNaN(line)) {
-        return {
-            tag: "nomatch",
-            input: input,
-            message: "Line (".concat(match.groups.line, ") did not parse as Integer"),
-        };
+        return null;
     }
-    return { tag: "match", input: input, path: path, line: line };
+    return { input: input, path: path, line: line };
 }
 
 
@@ -344,28 +341,15 @@ function getFiles(onlyChanged, changedFiles, pattern) {
     });
 }
 function toAnnotation(pattern, result) {
-    switch (result.tag) {
-        case "match":
-            return {
-                path: result.path,
-                start_line: result.line,
-                end_line: result.line,
-                annotation_level: pattern.level,
-                message: pattern.message,
-                title: pattern.title || "",
-                raw_details: result.input,
-            };
-        case "nomatch":
-            return {
-                path: "unknown",
-                start_line: 0,
-                end_line: 0,
-                annotation_level: "notice",
-                message: "Grep output not parsable: ".concat(result.message),
-                title: "",
-                raw_details: result.input,
-            };
-    }
+    return {
+        path: result.path,
+        start_line: result.line,
+        end_line: result.line,
+        annotation_level: pattern.level,
+        message: pattern.message,
+        title: pattern.title || "",
+        raw_details: result.input,
+    };
 }
 function run() {
     return __awaiter(this, void 0, void 0, function () {

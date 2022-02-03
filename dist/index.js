@@ -11,10 +11,11 @@ exports.matchesAny = exports.loadPatterns = void 0;
 var yaml = __nccwpck_require__(1917);
 var minimatch_1 = __nccwpck_require__(3973);
 function fromPatternYaml(patternYaml) {
-    var pattern = patternYaml.pattern, paths = patternYaml.paths, level = patternYaml.level, title = patternYaml.title, message = patternYaml.message;
+    var pattern = patternYaml.pattern, syntax = patternYaml.syntax, paths = patternYaml.paths, level = patternYaml.level, title = patternYaml.title, message = patternYaml.message;
     var pathsIgnore = patternYaml["paths-ignore"];
     return {
         pattern: pattern,
+        syntax: syntax || "basic",
         paths: paths || ["**/*"],
         pathsIgnore: pathsIgnore || [],
         level: level || "notice",
@@ -194,14 +195,33 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.parseGrep = exports.grep = void 0;
 var exec = __nccwpck_require__(1514);
-function grep(args) {
+function grepSyntaxOption(syntax) {
+    switch (syntax) {
+        case "extended":
+            return "--extended-regexp";
+        case "fixed":
+            return "--fixed-strings";
+        case "basic":
+            return "--basic-regexp";
+        case "perl":
+            return "--perl-regexp";
+    }
+}
+function grep(syntax, pattern, files, silent) {
     return __awaiter(this, void 0, void 0, function () {
         var stdout, grepArgs;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
                     stdout = "";
-                    grepArgs = ["--line-number", "--color=never"].concat(args);
+                    // Tricks grep into always adding <file>: by ensuring more than one file arg
+                    files.push("/dev/null");
+                    grepArgs = [
+                        "--line-number",
+                        "--color=never",
+                        grepSyntaxOption(syntax),
+                        pattern,
+                    ].concat(files);
                     return [4 /*yield*/, exec.exec("grep", grepArgs, {
                             listeners: {
                                 stdout: function (data) {
@@ -209,6 +229,7 @@ function grep(args) {
                                 },
                             },
                             ignoreReturnCode: true,
+                            silent: silent || false,
                         })];
                 case 1:
                     _a.sent();
@@ -382,7 +403,7 @@ function run() {
                                     return [4 /*yield*/, getFiles(onlyChanged, changedFiles, pattern)];
                                 case 1:
                                     files = _c.sent();
-                                    return [4 /*yield*/, (0, grep_1.grep)([pattern.pattern].concat(files))];
+                                    return [4 /*yield*/, (0, grep_1.grep)(pattern.syntax, pattern.pattern, files)];
                                 case 2:
                                     results = _c.sent();
                                     core.info("Grepped ".concat(files.length, " file(s) => ").concat(results.length, " result(s)"));

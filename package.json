@@ -4,7 +4,7 @@
   "description": "Run grep and submit results, with context, as Annotations",
   "main": "lib/main.js",
   "scripts": {
-    "build": "tsc && ncc build lib/main.js && dos2unix dist/index.js",
+    "build": "tsc && ncc build lib/main.js && sed -i 's/\\x0D$//' ./dist/index.js",
     "format": "prettier --write \"**/*.ts\"",
     "format-check": "prettier --check \"**/*.ts\"",
     "test": "jest"

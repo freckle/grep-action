@@ -45,6 +45,9 @@ jobs:
               paths:
                 - "**/*"
 
+              paths-ignore:
+                - "test/**/*"
+
               title: A brief title
 
               message: |

@@ -15,7 +15,9 @@ jobs:
           patterns: |
             - pattern: "\\bsetFailed\\b"
               paths:
-                - "src/**.ts"
+                - "src/**/*.ts"
+              paths-ignore:
+                - "src/**/*.test.ts"
 
               # Must be notice|warning|failure
               level: warning

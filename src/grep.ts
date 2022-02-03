@@ -15,6 +15,9 @@ export async function grep(args: string[]): Promise<GrepResult[]> {
   // Always number lines and never use color
   const grepArgs = ["--line-number", "--color=never"].concat(args);
 
+  // Tricks grep into always adding <file>: by ensuring more than one file arg
+  files.push("/dev/null");
+
   await exec.exec("grep", grepArgs, {
     listeners: {
       stdout: (data: Buffer) => {

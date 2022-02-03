@@ -34,28 +34,15 @@ async function getFiles(
 }
 
 function toAnnotation(pattern: Pattern, result: GrepResult): Annotation {
-  switch (result.tag) {
-    case "match":
-      return {
-        path: result.path,
-        start_line: result.line,
-        end_line: result.line,
-        annotation_level: pattern.level,
-        message: pattern.message,
-        title: pattern.title || "",
-        raw_details: result.input,
-      };
-    case "nomatch":
-      return {
-        path: "unknown",
-        start_line: 0,
-        end_line: 0,
-        annotation_level: "notice",
-        message: `Grep output not parsable: ${result.message}`,
-        title: "",
-        raw_details: result.input,
-      };
-  }
+  return {
+    path: result.path,
+    start_line: result.line,
+    end_line: result.line,
+    annotation_level: pattern.level,
+    message: pattern.message,
+    title: pattern.title || "",
+    raw_details: result.input,
+  };
 }
 
 async function run() {

@@ -12,7 +12,7 @@ export type Pattern = {
 function fromPatternYaml({ pattern, paths, level, title, message }): Pattern {
   return {
     pattern,
-    paths: paths || ["**"],
+    paths: paths || ["**/*"],
     level: level || "notice",
     title,
     message: message === undefined ? null : message,

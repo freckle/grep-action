@@ -14,14 +14,14 @@ test("Loads minimal Patterns", () => {
   expect(results).toEqual([
     {
       pattern: "abc",
-      paths: ["**"],
+      paths: ["**/*"],
       level: "notice",
       title: "Found abc",
       message: null,
     },
     {
       pattern: "xyz",
-      paths: ["**"],
+      paths: ["**/*"],
       level: "notice",
       title: "Found xyz",
       message: null,
@@ -33,14 +33,14 @@ test("Respects paths", () => {
   const example = [
     "- pattern: abc",
     "  paths:",
-    "    - '**.js'",
+    "    - '**/*.js'",
     "  title: Found abc",
   ].join("\n");
 
   const results = config.loadPatterns(example);
 
   expect(results.length).toBe(1);
-  expect(results[0].paths).toEqual(["**.js"]);
+  expect(results[0].paths).toEqual(["**/*.js"]);
 });
 
 test("Respects level", () => {

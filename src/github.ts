@@ -4,6 +4,8 @@ import { RestEndpointMethodTypes } from "@octokit/plugin-rest-endpoint-methods";
 
 type ClientType = ReturnType<typeof github.getOctokit>;
 
+const MAX_ANNOTATIONS = 50;
+
 export function getClient(token: string): ClientType {
   return github.getOctokit(token);
 }
@@ -55,11 +57,11 @@ function buildOutput(annotations: Annotation[]): Output {
   const title = `${annotationsCount} result(s) found by grep`;
   const summary = "";
 
-  if (annotationsCount > 50) {
-    core.warning("Only 50 annotations will be added to Check");
+  if (annotationsCount > MAX_ANNOTATIONS) {
+    core.warning(`Only ${MAX_ANNOTATIONS} annotations will be added to Check`);
   }
 
-  return { title, summary, annotations: annotations.slice(0, 50) };
+  return { title, summary, annotations: annotations.slice(0, MAX_ANNOTATIONS) };
 }
 
 type ListFilesResponse =

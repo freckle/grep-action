@@ -20,7 +20,7 @@ async function getFiles(
 ): Promise<string[]> {
   if (onlyChanged) {
     return changedFiles.filter((file) => {
-      config.matchesAny(pattern, file);
+      return config.matchesAny(pattern, file);
     });
   } else {
     const globber = await glob.create(pattern.paths.join("\n"));

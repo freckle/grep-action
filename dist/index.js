@@ -305,7 +305,7 @@ function getFiles(onlyChanged, changedFiles, pattern) {
                 case 0:
                     if (!onlyChanged) return [3 /*break*/, 1];
                     return [2 /*return*/, changedFiles.filter(function (file) {
-                            config.matchesAny(pattern, file);
+                            return config.matchesAny(pattern, file);
                         })];
                 case 1: return [4 /*yield*/, glob.create(pattern.paths.join("\n"))];
                 case 2:
@@ -313,7 +313,11 @@ function getFiles(onlyChanged, changedFiles, pattern) {
                     return [4 /*yield*/, globber.glob()];
                 case 3:
                     paths = _a.sent();
-                    return [2 /*return*/, paths.map(function (p) { return (0, path_1.relative)(process.cwd(), p); })];
+                    return [2 /*return*/, paths
+                            .map(function (p) { return (0, path_1.relative)(process.cwd(), p); })
+                            .filter(function (file) {
+                            return config.matchesAny(pattern, file);
+                        })];
             }
         });
     });

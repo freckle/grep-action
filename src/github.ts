@@ -35,7 +35,7 @@ export async function createCheck(
 ): Promise<void> {
   const output = buildOutput(annotations);
   const pullRequest = github.context.payload.pull_request;
-  const head_sha = (pullRequest && pullRequest.head.sha) || github.context.sha;
+  const head_sha = pullRequest?.head.sha ?? github.context.sha;
   const status = "completed";
   const failures = output.annotations.filter((a) => {
     return a.annotation_level === "failure";

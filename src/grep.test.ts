@@ -11,16 +11,7 @@ async function grepLines(
   const file = "/tmp/grep-action-test-grep.txt";
   fs.writeFileSync(file, lines.join("\n"));
   const results = await grep(syntax, pattern, [file], true);
-
-  return results
-    .map((r) => {
-      if (r.tag === "match") {
-        return r.line;
-      } else {
-        return -1;
-      }
-    })
-    .filter((x) => x >= 0);
+  return results.map((r) => r.line);
 }
 
 test("grep -E", async () => {
@@ -79,23 +70,19 @@ test("Matches path and column", () => {
 
   expect(results).toEqual([
     {
-      tag: "match",
       input: "src/main.ts:32:      core.setFailed(error.message);",
       path: "src/main.ts",
       line: 32,
     },
     {
-      tag: "match",
       input: "src/main.ts:35:      core.setFailed(error);",
       path: "src/main.ts",
       line: 35,
     },
     {
-      tag: "match",
       input: 'src/main.ts:38:      core.setFailed("Non-Error exception");',
       path: "src/main.ts",
       line: 38,
     },
-    { tag: "nomatch", input: "", message: '"" did not match' },
   ]);
 });

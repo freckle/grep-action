@@ -15,14 +15,11 @@ function grepSyntaxOption(syntax: GrepSyntax): string {
   }
 }
 
-export type GrepResult =
-  | {
-      tag: "match";
-      input: string;
-      path: string;
-      line: number;
-    }
-  | { tag: "nomatch"; input: string; message: string };
+export type GrepResult = {
+  input: string;
+  path: string;
+  line: number;
+};
 
 export async function grep(
   syntax: GrepSyntax,
@@ -58,29 +55,26 @@ export async function grep(
 // Exported for testing
 export function parseGrep(stdout: string): GrepResult[] {
   // TODO Naive newline split (no Windows)
-  return stdout.split("\n").map(parseGrepLine);
+  return stdout
+    .split("\n")
+    .map(parseGrepLine)
+    .filter((x) => x !== null);
 }
 
-function parseGrepLine(input: string): GrepResult {
+function parseGrepLine(input: string): GrepResult | null {
   const regex = /^(?<path>[^:]+):(?<line>[0-9]+):.*$/;
   const match = input.match(regex);
 
   if (match === null) {
-    return {
-      tag: "nomatch",
-      input,
-      message: `"${input}" did not match`,
-    };
+    return null;
   }
 
   const path = match.groups.path;
   const line = parseInt(match.groups.line, 10);
 
   if (isNaN(line)) {
-    throw new Error(
-      `Line number failed to parse. Input: ${input}, Line: ${match.groups.line}`
-    );
+    return null;
   }
 
-  return { tag: "match", input, path, line };
+  return { input, path, line };
 }

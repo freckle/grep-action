@@ -1,6 +1,7 @@
 import type { Pattern } from "./config";
 import * as config from "./config";
 import type { AnnotationLevel } from "./github";
+import type { GrepSyntax } from "./grep";
 
 test("Loads minimal Patterns", () => {
   const example = [
@@ -15,6 +16,7 @@ test("Loads minimal Patterns", () => {
   expect(results).toEqual([
     {
       pattern: "abc",
+      syntax: "basic",
       paths: ["**/*"],
       pathsIgnore: [],
       level: "notice",
@@ -23,6 +25,7 @@ test("Loads minimal Patterns", () => {
     },
     {
       pattern: "xyz",
+      syntax: "basic",
       paths: ["**/*"],
       pathsIgnore: [],
       level: "notice",
@@ -44,6 +47,19 @@ test("Respects paths", () => {
 
   expect(results.length).toBe(1);
   expect(results[0].paths).toEqual(["**/*.js"]);
+});
+
+test("Respects syntax", () => {
+  const example = [
+    "- pattern: abc",
+    "  syntax: perl",
+    "  title: Found abc",
+  ].join("\n");
+
+  const results = config.loadPatterns(example);
+
+  expect(results.length).toBe(1);
+  expect(results[0].syntax).toEqual("perl");
 });
 
 test("Respects paths-ignore", () => {
@@ -78,6 +94,7 @@ test("Respects level", () => {
 test("matchesAny", () => {
   const pattern = {
     pattern: "",
+    syntax: "basic" as GrepSyntax,
     paths: ["**/*.js", "**/README.md"],
     pathsIgnore: ["**/*.test.js", "test/**/*"],
     level: "notice" as AnnotationLevel,

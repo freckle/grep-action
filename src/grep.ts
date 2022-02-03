@@ -1,5 +1,20 @@
 import * as exec from "@actions/exec";
 
+export type GrepSyntax = "extended" | "fixed" | "basic" | "perl";
+
+function grepSyntaxOption(syntax: GrepSyntax): string {
+  switch (syntax) {
+    case "extended":
+      return "--extended-regexp";
+    case "fixed":
+      return "--fixed-strings";
+    case "basic":
+      return "--basic-regexp";
+    case "perl":
+      return "--perl-regexp";
+  }
+}
+
 export type GrepResult =
   | {
       tag: "match";
@@ -9,14 +24,23 @@ export type GrepResult =
     }
   | { tag: "nomatch"; input: string; message: string };
 
-export async function grep(args: string[]): Promise<GrepResult[]> {
+export async function grep(
+  syntax: GrepSyntax,
+  pattern: string,
+  files: string[],
+  silent?: boolean
+): Promise<GrepResult[]> {
   let stdout = "";
-
-  // Always number lines and never use color
-  const grepArgs = ["--line-number", "--color=never"].concat(args);
 
   // Tricks grep into always adding <file>: by ensuring more than one file arg
   files.push("/dev/null");
+
+  const grepArgs = [
+    "--line-number",
+    "--color=never",
+    grepSyntaxOption(syntax),
+    pattern,
+  ].concat(files);
 
   await exec.exec("grep", grepArgs, {
     listeners: {
@@ -25,6 +49,7 @@ export async function grep(args: string[]): Promise<GrepResult[]> {
       },
     },
     ignoreReturnCode: true,
+    silent: silent || false,
   });
 
   return parseGrep(stdout);

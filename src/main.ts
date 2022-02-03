@@ -87,7 +87,7 @@ async function run() {
     for (const pattern of patterns) {
       core.startGroup(`grep "${pattern.pattern}"`);
       const files = await getFiles(onlyChanged, changedFiles, pattern);
-      const results = await grep([pattern.pattern].concat(files));
+      const results = await grep(pattern.syntax, pattern.pattern, files);
 
       core.info(
         `Grepped ${files.length} file(s) => ${results.length} result(s)`

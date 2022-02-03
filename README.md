@@ -81,6 +81,12 @@ Array of Objects with the following keys:
 
   [man-grep]: https://linux.die.net/man/1/grep
 
+- `syntax`
+
+  The `grep` "Pattern Syntax" to use. This corresponds to `grep`'s `-E`, `F`,
+  `-G`, or `-P` options. One of `extended`, `fixed`, `basic`, or `perl`. Default
+  is `basic` (like `grep` itself).
+
 - `paths`
 
   List of globs, files matching any will be `grep`ped. Default is everything
@@ -116,7 +122,6 @@ None.
 ## TODO
 
 - [ ] Lift the 50-annotations limit, by updating in batches
-- [ ] Support for triggering `-E`, `-F`, `-G`, or `-P`-like behaviors
 
 ---
 

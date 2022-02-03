@@ -19,10 +19,8 @@ async function getFiles(
   pattern: Pattern
 ): Promise<string[]> {
   if (onlyChanged) {
-    const matchers = pattern.paths.map((p) => new Minimatch(p));
-
     return changedFiles.filter((file) => {
-      matchers.some((m) => m.match(file));
+      config.matchesAny(pattern, file);
     });
   } else {
     const globber = await glob.create(pattern.paths.join("\n"));

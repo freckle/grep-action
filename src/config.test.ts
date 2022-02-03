@@ -1,5 +1,6 @@
 import type { Pattern } from "./config";
 import * as config from "./config";
+import type { AnnotationLevel } from "./github";
 
 test("Loads minimal Patterns", () => {
   const example = [
@@ -54,4 +55,17 @@ test("Respects level", () => {
 
   expect(results.length).toBe(1);
   expect(results[0].level).toEqual("warning");
+});
+
+test("matchesAny", () => {
+  const pattern = {
+    pattern: "",
+    paths: ["**/*.js", "**/README.md"],
+    level: "notice" as AnnotationLevel,
+    title: "xyz",
+    message: null,
+  };
+
+  expect(config.matchesAny(pattern, "src/config.js")).toBe(true);
+  expect(config.matchesAny(pattern, "doc/README.md")).toBe(true);
 });

@@ -6,15 +6,20 @@ import type { AnnotationLevel } from "./github";
 export type Pattern = {
   pattern: string;
   paths: string[];
+  pathsIgnore: string[];
   level: AnnotationLevel;
   title: string;
   message: string | null;
 };
 
-function fromPatternYaml({ pattern, paths, level, title, message }): Pattern {
+function fromPatternYaml(patternYaml): Pattern {
+  const { pattern, paths, level, title, message } = patternYaml;
+  const pathsIgnore = patternYaml["paths-ignore"];
+
   return {
     pattern,
     paths: paths || ["**/*"],
+    pathsIgnore: pathsIgnore || [],
     level: level || "notice",
     title,
     message: message === undefined ? null : message,
@@ -24,6 +29,7 @@ function fromPatternYaml({ pattern, paths, level, title, message }): Pattern {
 type PatternYaml = {
   pattern: string;
   paths: string[] | null;
+  "paths-ignore": string[] | null;
   level: AnnotationLevel | null;
   title: string;
   message: string | null;
@@ -35,6 +41,10 @@ export function loadPatterns(input: string): Pattern[] {
 }
 
 export function matchesAny(pattern: Pattern, file: string): boolean {
-  const matchers = pattern.paths.map((p) => new Minimatch(p));
-  return matchers.some((m) => m.match(file));
+  const keepMatchers = pattern.paths.map((p) => new Minimatch(p));
+  const discardMatchers = pattern.pathsIgnore.map((p) => new Minimatch(p));
+  return (
+    keepMatchers.some((m) => m.match(file)) &&
+    !discardMatchers.some((m) => m.match(file))
+  );
 }

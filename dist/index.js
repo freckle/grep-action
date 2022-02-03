@@ -7,13 +7,16 @@
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.loadPatterns = void 0;
+exports.matchesAny = exports.loadPatterns = void 0;
 var yaml = __nccwpck_require__(1917);
-function fromPatternYaml(_a) {
-    var pattern = _a.pattern, paths = _a.paths, level = _a.level, title = _a.title, message = _a.message;
+var minimatch_1 = __nccwpck_require__(3973);
+function fromPatternYaml(patternYaml) {
+    var pattern = patternYaml.pattern, paths = patternYaml.paths, level = patternYaml.level, title = patternYaml.title, message = patternYaml.message;
+    var pathsIgnore = patternYaml["paths-ignore"];
     return {
         pattern: pattern,
-        paths: paths || ["**"],
+        paths: paths || ["**/*"],
+        pathsIgnore: pathsIgnore || [],
         level: level || "notice",
         title: title,
         message: message === undefined ? null : message,
@@ -24,6 +27,13 @@ function loadPatterns(input) {
     return patternsYaml.map(fromPatternYaml);
 }
 exports.loadPatterns = loadPatterns;
+function matchesAny(pattern, file) {
+    var keepMatchers = pattern.paths.map(function (p) { return new minimatch_1.Minimatch(p); });
+    var discardMatchers = pattern.pathsIgnore.map(function (p) { return new minimatch_1.Minimatch(p); });
+    return (keepMatchers.some(function (m) { return m.match(file); }) &&
+        !discardMatchers.some(function (m) { return m.match(file); }));
+}
+exports.matchesAny = matchesAny;
 
 
 /***/ }),
@@ -281,7 +291,6 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-var minimatch_1 = __nccwpck_require__(3973);
 var path_1 = __nccwpck_require__(1017);
 var core = __nccwpck_require__(2186);
 var glob = __nccwpck_require__(8090);
@@ -290,14 +299,13 @@ var github = __nccwpck_require__(5928);
 var grep_1 = __nccwpck_require__(4938);
 function getFiles(onlyChanged, changedFiles, pattern) {
     return __awaiter(this, void 0, void 0, function () {
-        var matchers_1, globber, paths;
+        var globber, paths;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
                     if (!onlyChanged) return [3 /*break*/, 1];
-                    matchers_1 = pattern.paths.map(function (p) { return new minimatch_1.Minimatch(p); });
                     return [2 /*return*/, changedFiles.filter(function (file) {
-                            matchers_1.some(function (m) { return m.match(file); });
+                            config.matchesAny(pattern, file);
                         })];
                 case 1: return [4 /*yield*/, glob.create(pattern.paths.join("\n"))];
                 case 2:

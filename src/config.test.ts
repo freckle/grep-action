@@ -16,6 +16,7 @@ test("Loads minimal Patterns", () => {
     {
       pattern: "abc",
       paths: ["**/*"],
+      pathsIgnore: [],
       level: "notice",
       title: "Found abc",
       message: null,
@@ -23,6 +24,7 @@ test("Loads minimal Patterns", () => {
     {
       pattern: "xyz",
       paths: ["**/*"],
+      pathsIgnore: [],
       level: "notice",
       title: "Found xyz",
       message: null,
@@ -44,6 +46,22 @@ test("Respects paths", () => {
   expect(results[0].paths).toEqual(["**/*.js"]);
 });
 
+test("Respects paths-ignore", () => {
+  const example = [
+    "- pattern: abc",
+    "  paths:",
+    "    - '**/*.js'",
+    "  paths-ignore:",
+    "    - '**/*.test.js'",
+    "  title: Found abc",
+  ].join("\n");
+
+  const results = config.loadPatterns(example);
+
+  expect(results.length).toBe(1);
+  expect(results[0].pathsIgnore).toEqual(["**/*.test.js"]);
+});
+
 test("Respects level", () => {
   const example = [
     "- pattern: abc",
@@ -61,11 +79,14 @@ test("matchesAny", () => {
   const pattern = {
     pattern: "",
     paths: ["**/*.js", "**/README.md"],
+    pathsIgnore: ["**/*.test.js", "test/**/*"],
     level: "notice" as AnnotationLevel,
     title: "xyz",
     message: null,
   };
 
   expect(config.matchesAny(pattern, "src/config.js")).toBe(true);
+  expect(config.matchesAny(pattern, "src/config.test.js")).toBe(false);
   expect(config.matchesAny(pattern, "doc/README.md")).toBe(true);
+  expect(config.matchesAny(pattern, "test/README.md")).toBe(false);
 });

@@ -25,7 +25,11 @@ async function getFiles(
   } else {
     const globber = await glob.create(pattern.paths.join("\n"));
     const paths = await globber.glob();
-    return paths.map((p) => relative(process.cwd(), p));
+    return paths
+      .map((p) => relative(process.cwd(), p))
+      .filter((file) => {
+        return config.matchesAny(pattern, file);
+      });
   }
 }
 

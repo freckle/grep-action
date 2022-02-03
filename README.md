@@ -37,7 +37,7 @@ jobs:
   grep:
     runs-on: ubuntu-latest
     steps:
-      - uses: freckle/grep-action
+      - uses: freckle/grep-action@v1
         with:
           patterns: |
             - pattern: "\\bword\\b"

@@ -48,6 +48,8 @@ jobs:
               paths-ignore:
                 - "test/**/*"
 
+              level: warning
+
               title: A brief title
 
               message: |
@@ -56,7 +58,7 @@ jobs:
 
 ## Inputs
 
-- `patterns`: A string of yaml, representing a list of patterns (see above).
+- `patterns`: See below.
 
 - `only-changed`: If `true` (the default), only the files changed in the Pull
   Request will be considered.
@@ -66,6 +68,42 @@ jobs:
 - `github-token`: override the default `GITHUB_TOKEN`, if desired.
 
 See [`./action.yml`](./action.yml) for complete details.
+
+## The `patterns` Input
+
+The `patterns` input is a String (as all inputs must be) that contains a Yaml
+Array of Objects with the following keys:
+
+- `pattern`
+
+  A `grep` "Basic Regular Expression". See the "Basic vs Extended Regular
+  Expressions" section of [`grep(1)`][man-grep] for more details. **Required**.
+
+  [man-grep]: https://linux.die.net/man/1/grep
+
+- `paths`
+
+  List of globs, files matching any will be `grep`ped. Default is everything
+  (`["**/*"]`).
+
+- `paths-ignore`
+
+  List of globs, files matching `paths` but that match any of these will **not**
+  be `grep`ped. Default is none (`[]`).
+
+- `level`
+
+  The level of the resulting annotation, `notice|warning|failure`. Default is
+  `notice`.
+
+- `title`
+
+  A short title for the annotation resulting from this pattern. **Required**.
+
+- `message`
+
+  A longer message for the annotation resulting from this pattern. Default is
+  none.
 
 ## Outputs
 

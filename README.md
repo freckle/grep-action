@@ -12,7 +12,7 @@ Action.
 [grep-license]: https://github.com/codeclimate/codeclimate-grep/blob/master/LICENSE
 
 The `grep` engine is a low-friction way to introduce automated, timely, and
-*useful* feedback on any piece of incoming code you can target with a regular
+_useful_ feedback on any piece of incoming code you can target with a regular
 expression.
 
 We wanted it as a GitHub Action to gain:

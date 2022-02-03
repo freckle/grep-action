@@ -40,7 +40,9 @@ jobs:
       - uses: freckle/grep-action
         with:
           patterns: |
-            - pattern: "re"
+            - pattern: "\\bword\\b"
+
+              syntax: extended
 
               paths:
                 - "**/*"

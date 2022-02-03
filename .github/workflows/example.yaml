@@ -14,8 +14,13 @@ jobs:
         with:
           patterns: |
             - pattern: "\\<setFailed\\>"
+
+              # Must be basic|extended|fixed|perl
+              syntax: basic
+
               paths:
                 - "src/**/*.ts"
+
               paths-ignore:
                 - "src/**/*.test.ts"
 

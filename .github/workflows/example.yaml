@@ -38,7 +38,4 @@ jobs:
 
                 https://github.community/t/checks-ability-to-include-markdown-in-line-annotations/14736/3
 
-              # Limit 64KB
-              raw_details: "Some raw details, whatever that means"
-
           only-changed: false

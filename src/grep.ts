@@ -77,11 +77,9 @@ function parseGrepLine(input: string): GrepResult {
   const line = parseInt(match.groups.line, 10);
 
   if (isNaN(line)) {
-    return {
-      tag: "nomatch",
-      input,
-      message: `Line (${match.groups.line}) did not parse as Integer`,
-    };
+    throw new Error(
+      `Line number failed to parse. Input: ${input}, Line: ${match.groups.line}`
+    );
   }
 
   return { tag: "match", input, path, line };

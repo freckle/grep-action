@@ -131,6 +131,8 @@ function createCheck(client, name, annotations) {
                     sliced = annotations.slice(i, i + MAX_ANNOTATIONS);
                     core.info("Updating Check with ".concat(sliced.length, " more annotation(s)"));
                     return [4 /*yield*/, client.rest.checks.update(__assign(__assign({}, github.context.repo), { check_run_id: check_run_id, output: {
+                                title: title,
+                                summary: summary,
                                 annotations: annotations.slice(i, i + MAX_ANNOTATIONS),
                             } }))];
                 case 3:

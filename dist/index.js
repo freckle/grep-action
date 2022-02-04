@@ -103,36 +103,48 @@ exports.getClient = getClient;
 function createCheck(client, name, annotations) {
     var _a;
     return __awaiter(this, void 0, void 0, function () {
-        var output, pullRequest, head_sha, status, failures, conclusion;
+        var pullRequest, head_sha, status, failures, conclusion, title, summary, resp, check_run_id, i, sliced;
         return __generator(this, function (_b) {
             switch (_b.label) {
                 case 0:
-                    output = buildOutput(annotations);
                     pullRequest = github.context.payload.pull_request;
                     head_sha = (_a = pullRequest === null || pullRequest === void 0 ? void 0 : pullRequest.head.sha) !== null && _a !== void 0 ? _a : github.context.sha;
                     status = "completed";
-                    failures = output.annotations.filter(function (a) {
+                    failures = annotations.filter(function (a) {
                         return a.annotation_level === "failure";
                     });
                     conclusion = failures.length > 0 ? "failure" : "success";
-                    return [4 /*yield*/, client.rest.checks.create(__assign(__assign({}, github.context.repo), { name: name, head_sha: head_sha, status: status, conclusion: conclusion, output: output }))];
+                    title = "".concat(annotations.length, " result(s) found by grep");
+                    summary = "";
+                    return [4 /*yield*/, client.rest.checks.create(__assign(__assign({}, github.context.repo), { name: name, head_sha: head_sha, status: status, conclusion: conclusion, output: {
+                                title: title,
+                                summary: summary,
+                                annotations: annotations.slice(0, MAX_ANNOTATIONS),
+                            } }))];
                 case 1:
+                    resp = _b.sent();
+                    check_run_id = resp.data.id;
+                    i = MAX_ANNOTATIONS;
+                    _b.label = 2;
+                case 2:
+                    if (!(i < annotations.length)) return [3 /*break*/, 5];
+                    sliced = annotations.slice(i, i + MAX_ANNOTATIONS);
+                    core.info("Updating Check with ".concat(sliced.length, " more annotation(s)"));
+                    return [4 /*yield*/, client.rest.checks.update(__assign(__assign({}, github.context.repo), { check_run_id: check_run_id, output: {
+                                annotations: annotations.slice(i, i + MAX_ANNOTATIONS),
+                            } }))];
+                case 3:
                     _b.sent();
-                    return [2 /*return*/];
+                    _b.label = 4;
+                case 4:
+                    i = i + MAX_ANNOTATIONS;
+                    return [3 /*break*/, 2];
+                case 5: return [2 /*return*/];
             }
         });
     });
 }
 exports.createCheck = createCheck;
-function buildOutput(annotations) {
-    var annotationsCount = annotations !== null ? annotations.length : 0;
-    var title = "".concat(annotationsCount, " result(s) found by grep");
-    var summary = "";
-    if (annotationsCount > MAX_ANNOTATIONS) {
-        core.warning("Only ".concat(MAX_ANNOTATIONS, " annotations will be added to Check"));
-    }
-    return { title: title, summary: summary, annotations: annotations.slice(0, MAX_ANNOTATIONS) };
-}
 function listPullRequestFiles(client) {
     return __awaiter(this, void 0, void 0, function () {
         var listFilesOptions, listFilesResponse;

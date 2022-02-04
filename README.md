@@ -121,10 +121,6 @@ None.
 
 ![](./screenshot.png)
 
-## TODO
-
-- [ ] Lift the 50-annotations limit, by updating in batches
-
 ---
 
 [LICENSE](./LICENSE)

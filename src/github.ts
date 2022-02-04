@@ -33,35 +33,46 @@ export async function createCheck(
   name: string,
   annotations: Annotation[]
 ): Promise<void> {
-  const output = buildOutput(annotations);
   const pullRequest = github.context.payload.pull_request;
   const head_sha = pullRequest?.head.sha ?? github.context.sha;
   const status = "completed";
-  const failures = output.annotations.filter((a) => {
+  const failures = annotations.filter((a) => {
     return a.annotation_level === "failure";
   });
   const conclusion = failures.length > 0 ? "failure" : "success";
+  const title = `${annotations.length} result(s) found by grep`;
+  const summary = "";
 
-  await client.rest.checks.create({
+  const resp = await client.rest.checks.create({
     ...github.context.repo,
     name,
     head_sha,
     status,
     conclusion,
-    output,
+    output: {
+      title,
+      summary,
+      annotations: annotations.slice(0, MAX_ANNOTATIONS),
+    },
   });
-}
 
-function buildOutput(annotations: Annotation[]): Output {
-  const annotationsCount = annotations !== null ? annotations.length : 0;
-  const title = `${annotationsCount} result(s) found by grep`;
-  const summary = "";
+  const check_run_id = resp.data.id;
 
-  if (annotationsCount > MAX_ANNOTATIONS) {
-    core.warning(`Only ${MAX_ANNOTATIONS} annotations will be added to Check`);
+  for (
+    let i = MAX_ANNOTATIONS;
+    i < annotations.length;
+    i = i + MAX_ANNOTATIONS
+  ) {
+    const sliced = annotations.slice(i, i + MAX_ANNOTATIONS);
+    core.info(`Updating Check with ${sliced.length} more annotation(s)`);
+    await client.rest.checks.update({
+      ...github.context.repo,
+      check_run_id,
+      output: {
+        annotations: annotations.slice(i, i + MAX_ANNOTATIONS),
+      },
+    });
   }
-
-  return { title, summary, annotations: annotations.slice(0, MAX_ANNOTATIONS) };
 }
 
 type ListFilesResponse =

@@ -69,6 +69,8 @@ export async function createCheck(
       ...github.context.repo,
       check_run_id,
       output: {
+        title,
+        summary,
         annotations: annotations.slice(i, i + MAX_ANNOTATIONS),
       },
     });

@@ -15,10 +15,11 @@ export type Pattern = {
   message: string | null;
 };
 
-function fromPatternYaml(patternYaml): Pattern {
-  const { pattern, syntax, binaryFiles, paths, level, title, message } =
+function fromPatternYaml(patternYaml: PatternYaml): Pattern {
+  const { pattern, syntax, paths, level, title, message } =
     patternYaml;
   const pathsIgnore = patternYaml["paths-ignore"];
+  const binaryFiles = patternYaml["binary-files"];
 
   return {
     pattern,

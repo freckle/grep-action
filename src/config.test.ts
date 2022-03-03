@@ -63,6 +63,19 @@ test("Respects syntax", () => {
   expect(results[0].syntax).toEqual("perl");
 });
 
+test("Respects binary-files", () => {
+  const example = [
+    "- pattern: abc",
+    "  binary-files: without-match",
+    "  title: Found abc",
+  ].join("\n");
+
+  const results = config.loadPatterns(example);
+
+  expect(results.length).toBe(1);
+  expect(results[0].binaryFiles).toEqual("without-match");
+});
+
 test("Respects paths-ignore", () => {
   const example = [
     "- pattern: abc",

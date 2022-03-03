@@ -16,8 +16,7 @@ export type Pattern = {
 };
 
 function fromPatternYaml(patternYaml: PatternYaml): Pattern {
-  const { pattern, syntax, paths, level, title, message } =
-    patternYaml;
+  const { pattern, syntax, paths, level, title, message } = patternYaml;
   const pathsIgnore = patternYaml["paths-ignore"];
   const binaryFiles = patternYaml["binary-files"];
 

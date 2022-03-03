@@ -93,7 +93,7 @@ Array of Objects with the following keys:
 
 - `binary-files`
 
-  Controls searching in binary files, corresponding to `grep`'s 
+  Controls searching in binary files, corresponding to `grep`'s
   `--binary-files=<value>` option. One of `binary` (search binary files but do
   not print), `without-match` (do not search binary files), or `text` (treat
   all files as text). Default is `binary` (like `grep` itself).

@@ -2,11 +2,12 @@ import * as yaml from "js-yaml";
 import { Minimatch } from "minimatch";
 
 import type { AnnotationLevel } from "./github";
-import type { GrepSyntax } from "./grep";
+import type { GrepSyntax, GrepBinaryFiles } from "./grep";
 
 export type Pattern = {
   pattern: string;
   syntax: GrepSyntax;
+  binaryFiles: GrepBinaryFiles;
   paths: string[];
   pathsIgnore: string[];
   level: AnnotationLevel;
@@ -14,13 +15,16 @@ export type Pattern = {
   message: string | null;
 };
 
+
 function fromPatternYaml(patternYaml: PatternYaml): Pattern {
-  const { pattern, syntax, paths, level, title, message } = patternYaml;
+  const { pattern, syntax, binaryFiles, paths, level, title, message } =
+    patternYaml;
   const pathsIgnore = patternYaml["paths-ignore"];
 
   return {
     pattern,
     syntax: syntax || "basic",
+    binaryFiles: binaryFiles || "binary",
     paths: paths || ["**/*"],
     pathsIgnore: pathsIgnore || [],
     level: level || "notice",
@@ -32,6 +36,7 @@ function fromPatternYaml(patternYaml: PatternYaml): Pattern {
 type PatternYaml = {
   pattern: string;
   syntax: GrepSyntax | null;
+  "binary-files": GrepBinaryFiles | null;
   paths: string[] | null;
   "paths-ignore": string[] | null;
   level: AnnotationLevel | null;

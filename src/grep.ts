@@ -15,6 +15,19 @@ function grepSyntaxOption(syntax: GrepSyntax): string {
   }
 }
 
+export type GrepBinaryFiles = "binary" | "without-match" | "text";
+
+function grepBinaryFilesOption(syntax: GrepBinaryFiles): string {
+  switch (syntax) {
+    case "binary":
+      return "--binary-files=binary";
+    case "without-match":
+      return "--binary-files=without-match";
+    case "text":
+      return "--binary-files=text";
+  }
+}
+
 export type GrepResult = {
   input: string;
   path: string;
@@ -23,6 +36,7 @@ export type GrepResult = {
 
 export async function grep(
   syntax: GrepSyntax,
+  binaryFiles: GrepBinaryFiles,
   pattern: string,
   files: string[],
   silent?: boolean
@@ -36,6 +50,7 @@ export async function grep(
     "--line-number",
     "--color=never",
     grepSyntaxOption(syntax),
+    grepBinaryFilesOption(binaryFiles),
     pattern,
   ].concat(files);
 

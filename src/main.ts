@@ -36,7 +36,7 @@ function toAnnotation(pattern: Pattern, result: GrepResult): Annotation {
     start_line: result.line,
     end_line: result.line,
     annotation_level: pattern.level,
-    message: pattern.message || "Flagged in freckle/grep-action",
+    message: pattern.message || "",
     title: pattern.title || "",
     raw_details: result.input,
   };
@@ -82,8 +82,6 @@ async function run() {
       });
       core.endGroup();
     }
-
-    core.info("Testing that this is working");
 
     core.info(`Creating Check result with ${annotations.length} annotation(s)`);
     await github.createCheck(client, "Grep results", annotations);

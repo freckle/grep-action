@@ -58,14 +58,14 @@ export function parseGrep(stdout: string): GrepResult[] {
   return stdout
     .split("\n")
     .map(parseGrepLine)
-    .filter((x) => x !== null);
+    .filter((x: GrepResult | null) => x !== null) as GrepResult[];
 }
 
 function parseGrepLine(input: string): GrepResult | null {
   const regex = /^(?<path>[^:]+):(?<line>[0-9]+):.*$/;
   const match = input.match(regex);
 
-  if (match === null) {
+  if (match === null || match.groups === undefined) {
     return null;
   }
 

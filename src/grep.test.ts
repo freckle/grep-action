@@ -1,6 +1,6 @@
 import * as fs from "fs";
 
-import type { GrepSyntax, GrepResult } from "./grep";
+import type { GrepSyntax } from "./grep";
 import { grep, parseGrep } from "./grep";
 
 async function grepLines(

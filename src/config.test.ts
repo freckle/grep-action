@@ -1,4 +1,3 @@
-import type { Pattern } from "./config";
 import * as config from "./config";
 import type { AnnotationLevel } from "./github";
 import type { GrepSyntax } from "./grep";

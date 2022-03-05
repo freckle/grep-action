@@ -83,6 +83,8 @@ async function run() {
       core.endGroup();
     }
 
+    core.info("Testing that this is working");
+
     core.info(`Creating Check result with ${annotations.length} annotation(s)`);
     await github.createCheck(client, "Grep results", annotations);
   } catch (error) {

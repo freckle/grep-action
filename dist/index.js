@@ -433,7 +433,7 @@ function toAnnotation(pattern, result) {
         start_line: result.line,
         end_line: result.line,
         annotation_level: pattern.level,
-        message: pattern.message || "",
+        message: pattern.message || "Flagged in freckle/grep-action",
         title: pattern.title || "",
         raw_details: result.input,
     };

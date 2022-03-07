@@ -1,9 +1,6 @@
-import * as yaml from "js-yaml";
-import { Minimatch } from "minimatch";
 import { relative } from "path";
 
 import * as core from "@actions/core";
-import * as exec from "@actions/exec";
 import * as glob from "@actions/glob";
 
 import type { Pattern } from "./config";
@@ -39,7 +36,7 @@ function toAnnotation(pattern: Pattern, result: GrepResult): Annotation {
     start_line: result.line,
     end_line: result.line,
     annotation_level: pattern.level,
-    message: pattern.message,
+    message: pattern.message || "Flagged in freckle/grep-action",
     title: pattern.title || "",
     raw_details: result.input,
   };
@@ -69,7 +66,7 @@ async function run() {
 
     core.info(`Fetched ${changedFiles.length} changed file(s)`);
 
-    let annotations = [];
+    let annotations = [] as Annotation[];
 
     for (const pattern of patterns) {
       core.startGroup(`grep "${pattern.pattern}"`);

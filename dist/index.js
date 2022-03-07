@@ -2,13 +2,32 @@
 /******/ 	var __webpack_modules__ = ({
 
 /***/ 88:
-/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
 
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.matchesAny = exports.loadPatterns = void 0;
-var yaml = __nccwpck_require__(1917);
+var yaml = __importStar(__nccwpck_require__(1917));
 var minimatch_1 = __nccwpck_require__(3973);
 function fromPatternYaml(patternYaml) {
     var pattern = patternYaml.pattern, syntax = patternYaml.syntax, paths = patternYaml.paths, level = patternYaml.level, title = patternYaml.title, message = patternYaml.message;
@@ -55,6 +74,25 @@ var __assign = (this && this.__assign) || function () {
     };
     return __assign.apply(this, arguments);
 };
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -93,8 +131,8 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.listPullRequestFiles = exports.createCheck = exports.getClient = void 0;
-var core = __nccwpck_require__(2186);
-var github = __nccwpck_require__(5438);
+var core = __importStar(__nccwpck_require__(2186));
+var github = __importStar(__nccwpck_require__(5438));
 var MAX_ANNOTATIONS = 50;
 function getClient(token) {
     return github.getOctokit(token);
@@ -116,7 +154,7 @@ function createCheck(client, name, annotations) {
                     conclusion = failures.length > 0 ? "failure" : "success";
                     title = "".concat(annotations.length, " result(s) found by grep");
                     summary = "";
-                    return [4 /*yield*/, client.rest.checks.create(__assign(__assign({}, github.context.repo), { name: name, head_sha: head_sha, status: status, conclusion: conclusion, output: {
+                    return [4, client.rest.checks.create(__assign(__assign({}, github.context.repo), { name: name, head_sha: head_sha, status: status, conclusion: conclusion, output: {
                                 title: title,
                                 summary: summary,
                                 annotations: annotations.slice(0, MAX_ANNOTATIONS),
@@ -127,10 +165,10 @@ function createCheck(client, name, annotations) {
                     i = MAX_ANNOTATIONS;
                     _b.label = 2;
                 case 2:
-                    if (!(i < annotations.length)) return [3 /*break*/, 5];
+                    if (!(i < annotations.length)) return [3, 5];
                     sliced = annotations.slice(i, i + MAX_ANNOTATIONS);
                     core.info("Updating Check with ".concat(sliced.length, " more annotation(s)"));
-                    return [4 /*yield*/, client.rest.checks.update(__assign(__assign({}, github.context.repo), { check_run_id: check_run_id, output: {
+                    return [4, client.rest.checks.update(__assign(__assign({}, github.context.repo), { check_run_id: check_run_id, output: {
                                 title: title,
                                 summary: summary,
                                 annotations: annotations.slice(i, i + MAX_ANNOTATIONS),
@@ -140,8 +178,8 @@ function createCheck(client, name, annotations) {
                     _b.label = 4;
                 case 4:
                     i = i + MAX_ANNOTATIONS;
-                    return [3 /*break*/, 2];
-                case 5: return [2 /*return*/];
+                    return [3, 2];
+                case 5: return [2];
             }
         });
     });
@@ -154,10 +192,10 @@ function listPullRequestFiles(client) {
             switch (_a.label) {
                 case 0:
                     listFilesOptions = client.rest.pulls.listFiles.endpoint.merge(__assign(__assign({}, github.context.repo), { pull_number: github.context.issue.number }));
-                    return [4 /*yield*/, client.paginate(listFilesOptions)];
+                    return [4, client.paginate(listFilesOptions)];
                 case 1:
                     listFilesResponse = _a.sent();
-                    return [2 /*return*/, listFilesResponse.map(function (f) { return f.filename; })];
+                    return [2, listFilesResponse.map(function (f) { return f.filename; })];
             }
         });
     });
@@ -172,6 +210,25 @@ exports.listPullRequestFiles = listPullRequestFiles;
 
 "use strict";
 
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -210,7 +267,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.parseGrep = exports.grep = void 0;
-var exec = __nccwpck_require__(1514);
+var exec = __importStar(__nccwpck_require__(1514));
 function grepSyntaxOption(syntax) {
     switch (syntax) {
         case "extended":
@@ -230,7 +287,6 @@ function grep(syntax, pattern, files, silent) {
             switch (_a.label) {
                 case 0:
                     stdout = "";
-                    // Tricks grep into always adding <file>: by ensuring more than one file arg
                     files.push("/dev/null");
                     grepArgs = [
                         "--line-number",
@@ -238,7 +294,7 @@ function grep(syntax, pattern, files, silent) {
                         grepSyntaxOption(syntax),
                         pattern,
                     ].concat(files);
-                    return [4 /*yield*/, exec.exec("grep", grepArgs, {
+                    return [4, exec.exec("grep", grepArgs, {
                             listeners: {
                                 stdout: function (data) {
                                     stdout += data.toString();
@@ -249,15 +305,13 @@ function grep(syntax, pattern, files, silent) {
                         })];
                 case 1:
                     _a.sent();
-                    return [2 /*return*/, parseGrep(stdout)];
+                    return [2, parseGrep(stdout)];
             }
         });
     });
 }
 exports.grep = grep;
-// Exported for testing
 function parseGrep(stdout) {
-    // TODO Naive newline split (no Windows)
     return stdout
         .split("\n")
         .map(parseGrepLine)
@@ -267,7 +321,7 @@ exports.parseGrep = parseGrep;
 function parseGrepLine(input) {
     var regex = /^(?<path>[^:]+):(?<line>[0-9]+):.*$/;
     var match = input.match(regex);
-    if (match === null) {
+    if (match === null || match.groups === undefined) {
         return null;
     }
     var path = match.groups.path;
@@ -286,6 +340,25 @@ function parseGrepLine(input) {
 
 "use strict";
 
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -324,10 +397,10 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 var path_1 = __nccwpck_require__(1017);
-var core = __nccwpck_require__(2186);
-var glob = __nccwpck_require__(8090);
-var config = __nccwpck_require__(88);
-var github = __nccwpck_require__(5928);
+var core = __importStar(__nccwpck_require__(2186));
+var glob = __importStar(__nccwpck_require__(8090));
+var config = __importStar(__nccwpck_require__(88));
+var github = __importStar(__nccwpck_require__(5928));
 var grep_1 = __nccwpck_require__(4938);
 function getFiles(onlyChanged, changedFiles, pattern) {
     return __awaiter(this, void 0, void 0, function () {
@@ -335,17 +408,17 @@ function getFiles(onlyChanged, changedFiles, pattern) {
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
-                    if (!onlyChanged) return [3 /*break*/, 1];
-                    return [2 /*return*/, changedFiles.filter(function (file) {
+                    if (!onlyChanged) return [3, 1];
+                    return [2, changedFiles.filter(function (file) {
                             return config.matchesAny(pattern, file);
                         })];
-                case 1: return [4 /*yield*/, glob.create(pattern.paths.join("\n"))];
+                case 1: return [4, glob.create(pattern.paths.join("\n"))];
                 case 2:
                     globber = _a.sent();
-                    return [4 /*yield*/, globber.glob()];
+                    return [4, globber.glob()];
                 case 3:
                     paths = _a.sent();
-                    return [2 /*return*/, paths
+                    return [2, paths
                             .map(function (p) { return (0, path_1.relative)(process.cwd(), p); })
                             .filter(function (file) {
                             return config.matchesAny(pattern, file);
@@ -360,7 +433,7 @@ function toAnnotation(pattern, result) {
         start_line: result.line,
         end_line: result.line,
         annotation_level: pattern.level,
-        message: pattern.message,
+        message: pattern.message || "Flagged in freckle/grep-action",
         title: pattern.title || "",
         raw_details: result.input,
     };
@@ -380,11 +453,11 @@ function run() {
                     core.info("only-changed: ".concat(onlyChanged));
                     core.endGroup();
                     client = github.getClient(token);
-                    if (!onlyChanged) return [3 /*break*/, 2];
-                    return [4 /*yield*/, github.listPullRequestFiles(client)];
+                    if (!onlyChanged) return [3, 2];
+                    return [4, github.listPullRequestFiles(client)];
                 case 1:
                     _a = _b.sent();
-                    return [3 /*break*/, 3];
+                    return [3, 3];
                 case 2:
                     _a = [];
                     _b.label = 3;
@@ -398,10 +471,10 @@ function run() {
                             switch (_c.label) {
                                 case 0:
                                     core.startGroup("grep \"".concat(pattern.pattern, "\""));
-                                    return [4 /*yield*/, getFiles(onlyChanged, changedFiles, pattern)];
+                                    return [4, getFiles(onlyChanged, changedFiles, pattern)];
                                 case 1:
                                     files = _c.sent();
-                                    return [4 /*yield*/, (0, grep_1.grep)(pattern.syntax, pattern.pattern, files)];
+                                    return [4, (0, grep_1.grep)(pattern.syntax, pattern.pattern, files)];
                                 case 2:
                                     results = _c.sent();
                                     core.info("Grepped ".concat(files.length, " file(s) => ").concat(results.length, " result(s)"));
@@ -409,28 +482,28 @@ function run() {
                                         annotations_1.push(toAnnotation(pattern, result));
                                     });
                                     core.endGroup();
-                                    return [2 /*return*/];
+                                    return [2];
                             }
                         });
                     };
                     _i = 0, patterns_1 = patterns;
                     _b.label = 4;
                 case 4:
-                    if (!(_i < patterns_1.length)) return [3 /*break*/, 7];
+                    if (!(_i < patterns_1.length)) return [3, 7];
                     pattern = patterns_1[_i];
-                    return [5 /*yield**/, _loop_1(pattern)];
+                    return [5, _loop_1(pattern)];
                 case 5:
                     _b.sent();
                     _b.label = 6;
                 case 6:
                     _i++;
-                    return [3 /*break*/, 4];
+                    return [3, 4];
                 case 7:
                     core.info("Creating Check result with ".concat(annotations_1.length, " annotation(s)"));
-                    return [4 /*yield*/, github.createCheck(client, "Grep results", annotations_1)];
+                    return [4, github.createCheck(client, "Grep results", annotations_1)];
                 case 8:
                     _b.sent();
-                    return [3 /*break*/, 10];
+                    return [3, 10];
                 case 9:
                     error_1 = _b.sent();
                     if (error_1 instanceof Error) {
@@ -445,8 +518,8 @@ function run() {
                         core.error("Non-Error exception");
                         core.setFailed("Non-Error exception");
                     }
-                    return [3 /*break*/, 10];
-                case 10: return [2 /*return*/];
+                    return [3, 10];
+                case 10: return [2];
             }
         });
     });

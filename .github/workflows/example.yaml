@@ -43,4 +43,7 @@ jobs:
 
                 https://github.community/t/checks-ability-to-include-markdown-in-line-annotations/14736/3
 
+            - pattern: "(regex)"
+              title: "Minimal configuration test"
+
           only-changed: false

@@ -34,12 +34,16 @@ export type GrepResult = {
   line: number;
 };
 
+type GrepOptions = {
+  syntax: GrepSyntax;
+  binaryFiles: GrepBinaryFiles;
+  silent?: boolean;
+};
+
 export async function grep(
-  syntax: GrepSyntax,
-  binaryFiles: GrepBinaryFiles,
   pattern: string,
   files: string[],
-  silent?: boolean
+  { syntax, binaryFiles, silent = false }: GrepOptions
 ): Promise<GrepResult[]> {
   let stdout = "";
 
@@ -61,7 +65,7 @@ export async function grep(
       },
     },
     ignoreReturnCode: true,
-    silent: silent || false,
+    silent,
   });
 
   return parseGrep(stdout);

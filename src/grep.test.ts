@@ -10,7 +10,11 @@ async function grepLines(
 ): Promise<number[]> {
   const file = "/tmp/grep-action-test-grep.txt";
   fs.writeFileSync(file, lines.join("\n"));
-  const results = await grep(syntax, "binary", pattern, [file], true);
+  const results = await grep(pattern, [file], {
+    syntax,
+    binaryFiles: "binary",
+    silent: true,
+  });
   return results.map((r) => r.line);
 }
 

@@ -1,6 +1,6 @@
 import * as config from "./config";
 import type { AnnotationLevel } from "./github";
-import type { GrepSyntax } from "./grep";
+import type { GrepSyntax, GrepBinaryFiles } from "./grep";
 
 test("Loads minimal Patterns", () => {
   const example = [
@@ -16,6 +16,7 @@ test("Loads minimal Patterns", () => {
     {
       pattern: "abc",
       syntax: "basic",
+      binaryFiles: "binary",
       paths: ["**/*"],
       pathsIgnore: [],
       level: "notice",
@@ -25,6 +26,7 @@ test("Loads minimal Patterns", () => {
     {
       pattern: "xyz",
       syntax: "basic",
+      binaryFiles: "binary",
       paths: ["**/*"],
       pathsIgnore: [],
       level: "notice",
@@ -61,6 +63,19 @@ test("Respects syntax", () => {
   expect(results[0].syntax).toEqual("perl");
 });
 
+test("Respects binary-files", () => {
+  const example = [
+    "- pattern: abc",
+    "  binary-files: without-match",
+    "  title: Found abc",
+  ].join("\n");
+
+  const results = config.loadPatterns(example);
+
+  expect(results.length).toBe(1);
+  expect(results[0].binaryFiles).toEqual("without-match");
+});
+
 test("Respects paths-ignore", () => {
   const example = [
     "- pattern: abc",
@@ -94,6 +109,7 @@ test("matchesAny", () => {
   const pattern = {
     pattern: "",
     syntax: "basic" as GrepSyntax,
+    binaryFiles: "binary" as GrepBinaryFiles,
     paths: ["**/*.js", "**/README.md"],
     pathsIgnore: ["**/*.test.js", "test/**/*"],
     level: "notice" as AnnotationLevel,

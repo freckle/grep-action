@@ -32,9 +32,11 @@ var minimatch_1 = __nccwpck_require__(3973);
 function fromPatternYaml(patternYaml) {
     var pattern = patternYaml.pattern, syntax = patternYaml.syntax, paths = patternYaml.paths, level = patternYaml.level, title = patternYaml.title, message = patternYaml.message;
     var pathsIgnore = patternYaml["paths-ignore"];
+    var binaryFiles = patternYaml["binary-files"];
     return {
         pattern: pattern,
         syntax: syntax || "basic",
+        binaryFiles: binaryFiles || "binary",
         paths: paths || ["**/*"],
         pathsIgnore: pathsIgnore || [],
         level: level || "notice",
@@ -280,11 +282,22 @@ function grepSyntaxOption(syntax) {
             return "--perl-regexp";
     }
 }
-function grep(syntax, pattern, files, silent) {
+function grepBinaryFilesOption(syntax) {
+    switch (syntax) {
+        case "binary":
+            return "--binary-files=binary";
+        case "without-match":
+            return "--binary-files=without-match";
+        case "text":
+            return "--binary-files=text";
+    }
+}
+function grep(pattern, files, _a) {
+    var syntax = _a.syntax, binaryFiles = _a.binaryFiles, _b = _a.silent, silent = _b === void 0 ? false : _b;
     return __awaiter(this, void 0, void 0, function () {
         var stdout, grepArgs;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
+        return __generator(this, function (_c) {
+            switch (_c.label) {
                 case 0:
                     stdout = "";
                     files.push("/dev/null");
@@ -292,6 +305,7 @@ function grep(syntax, pattern, files, silent) {
                         "--line-number",
                         "--color=never",
                         grepSyntaxOption(syntax),
+                        grepBinaryFilesOption(binaryFiles),
                         pattern,
                     ].concat(files);
                     return [4, exec.exec("grep", grepArgs, {
@@ -301,10 +315,10 @@ function grep(syntax, pattern, files, silent) {
                                 },
                             },
                             ignoreReturnCode: true,
-                            silent: silent || false,
+                            silent: silent,
                         })];
                 case 1:
-                    _a.sent();
+                    _c.sent();
                     return [2, parseGrep(stdout)];
             }
         });
@@ -474,7 +488,10 @@ function run() {
                                     return [4, getFiles(onlyChanged, changedFiles, pattern)];
                                 case 1:
                                     files = _c.sent();
-                                    return [4, (0, grep_1.grep)(pattern.syntax, pattern.pattern, files)];
+                                    return [4, (0, grep_1.grep)(pattern.pattern, files, {
+                                            syntax: pattern.syntax,
+                                            binaryFiles: pattern.binaryFiles,
+                                        })];
                                 case 2:
                                     results = _c.sent();
                                     core.info("Grepped ".concat(files.length, " file(s) => ").concat(results.length, " result(s)"));

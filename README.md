@@ -44,6 +44,8 @@ jobs:
 
               syntax: extended
 
+              binary-files: without-match
+
               paths:
                 - "**/*"
 
@@ -88,6 +90,13 @@ Array of Objects with the following keys:
   The `grep` "Pattern Syntax" to use. This corresponds to `grep`'s `-E`, `F`,
   `-G`, or `-P` options. One of `extended`, `fixed`, `basic`, or `perl`. Default
   is `basic` (like `grep` itself).
+
+- `binary-files`
+
+  Controls searching in binary files, corresponding to `grep`'s
+  `--binary-files=<value>` option. One of `binary` (search binary files but do
+  not print), `without-match` (do not search binary files), or `text` (treat
+  all files as text). Default is `binary` (like `grep` itself).
 
 - `paths`
 

@@ -477,29 +477,32 @@ function run() {
                     _b.label = 3;
                 case 3:
                     changedFiles = _a;
-                    core.info("Fetched ".concat(changedFiles.length, " changed file(s)"));
+                    if (onlyChanged) {
+                        core.info("Fetched ".concat(changedFiles.length, " changed file(s)"));
+                    }
                     annotations_1 = [];
                     _loop_1 = function (pattern) {
                         var files, results;
                         return __generator(this, function (_c) {
                             switch (_c.label) {
-                                case 0:
-                                    core.startGroup("grep \"".concat(pattern.pattern, "\""));
-                                    return [4, getFiles(onlyChanged, changedFiles, pattern)];
+                                case 0: return [4, getFiles(onlyChanged, changedFiles, pattern)];
                                 case 1:
                                     files = _c.sent();
+                                    if (!(files.length !== 0)) return [3, 3];
+                                    core.startGroup("grep \"".concat(pattern.pattern, "\""));
                                     return [4, (0, grep_1.grep)(pattern.pattern, files, {
                                             syntax: pattern.syntax,
                                             binaryFiles: pattern.binaryFiles,
                                         })];
                                 case 2:
                                     results = _c.sent();
-                                    core.info("Grepped ".concat(files.length, " file(s) => ").concat(results.length, " result(s)"));
+                                    core.info("".concat(results.length, " result(s)"));
                                     results.forEach(function (result) {
                                         annotations_1.push(toAnnotation(pattern, result));
                                     });
                                     core.endGroup();
-                                    return [2];
+                                    _c.label = 3;
+                                case 3: return [2];
                             }
                         });
                     };

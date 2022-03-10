@@ -64,26 +64,30 @@ async function run() {
       ? await github.listPullRequestFiles(client)
       : [];
 
-    core.info(`Fetched ${changedFiles.length} changed file(s)`);
+    if (onlyChanged) {
+      // Don't print "0 changed files" when we've disabled the option
+      core.info(`Fetched ${changedFiles.length} changed file(s)`);
+    }
 
     let annotations = [] as Annotation[];
 
     for (const pattern of patterns) {
-      core.startGroup(`grep "${pattern.pattern}"`);
       const files = await getFiles(onlyChanged, changedFiles, pattern);
-      const results = await grep(pattern.pattern, files, {
-        syntax: pattern.syntax,
-        binaryFiles: pattern.binaryFiles,
-      });
 
-      core.info(
-        `Grepped ${files.length} file(s) => ${results.length} result(s)`
-      );
+      if (files.length !== 0) {
+        core.startGroup(`grep "${pattern.pattern}"`);
+        const results = await grep(pattern.pattern, files, {
+          syntax: pattern.syntax,
+          binaryFiles: pattern.binaryFiles,
+        });
 
-      results.forEach((result) => {
-        annotations.push(toAnnotation(pattern, result));
-      });
-      core.endGroup();
+        core.info(`${results.length} result(s)`);
+
+        results.forEach((result) => {
+          annotations.push(toAnnotation(pattern, result));
+        });
+        core.endGroup();
+      }
     }
 
     core.info(`Creating Check result with ${annotations.length} annotation(s)`);

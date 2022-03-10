@@ -64,7 +64,10 @@ async function run() {
       ? await github.listPullRequestFiles(client)
       : [];
 
-    core.info(`Fetched ${changedFiles.length} changed file(s)`);
+    if (onlyChanged) {
+      // Don't print "0 changed files" when we've disabled the option
+      core.info(`Fetched ${changedFiles.length} changed file(s)`);
+    }
 
     let annotations = [] as Annotation[];
 

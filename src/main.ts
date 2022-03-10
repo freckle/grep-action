@@ -78,9 +78,7 @@ async function run() {
           binaryFiles: pattern.binaryFiles,
         });
 
-        core.info(
-          `Grepped ${files.length} file(s) => ${results.length} result(s)`
-        );
+        core.info(`${results.length} result(s)`);
 
         results.forEach((result) => {
           annotations.push(toAnnotation(pattern, result));

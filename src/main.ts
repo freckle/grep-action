@@ -3,11 +3,10 @@ import { relative } from "path";
 import * as core from "@actions/core";
 import * as glob from "@actions/glob";
 
+import { Reporter } from "./reporter";
 import type { Pattern } from "./config";
 import * as config from "./config";
-import type { Annotation } from "./github";
 import * as github from "./github";
-import type { GrepResult } from "./grep";
 import { grep } from "./grep";
 
 async function getFiles(
@@ -28,18 +27,6 @@ async function getFiles(
         return config.matchesAny(pattern, file);
       });
   }
-}
-
-function toAnnotation(pattern: Pattern, result: GrepResult): Annotation {
-  return {
-    path: result.path,
-    start_line: result.line,
-    end_line: result.line,
-    annotation_level: pattern.level,
-    message: pattern.message || "Flagged in freckle/grep-action",
-    title: pattern.title || "",
-    raw_details: result.input,
-  };
 }
 
 async function run() {
@@ -69,7 +56,7 @@ async function run() {
       core.info(`Fetched ${changedFiles.length} changed file(s)`);
     }
 
-    let annotations = [] as Annotation[];
+    const reporter = new Reporter(createNewCheck);
 
     for (const pattern of patterns) {
       const files = await getFiles(onlyChanged, changedFiles, pattern);
@@ -84,14 +71,13 @@ async function run() {
         core.info(`${results.length} result(s)`);
 
         results.forEach((result) => {
-          annotations.push(toAnnotation(pattern, result));
+          reporter.onResult(pattern, result);
         });
         core.endGroup();
       }
     }
 
-    core.info(`Creating Check result with ${annotations.length} annotation(s)`);
-    await github.createCheck(client, "Grep results", annotations);
+    reporter.onFinish(client);
   } catch (error) {
     if (error instanceof Error) {
       core.error(error);

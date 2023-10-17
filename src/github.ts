@@ -31,15 +31,12 @@ export type AnnotationLevel = "notice" | "warning" | "failure";
 export async function createCheck(
   client: ClientType,
   name: string,
-  annotations: Annotation[]
+  annotations: Annotation[],
+  conclusion: string
 ): Promise<void> {
   const pullRequest = github.context.payload.pull_request;
   const head_sha = pullRequest?.head.sha ?? github.context.sha;
   const status = "completed";
-  const failures = annotations.filter((a) => {
-    return a.annotation_level === "failure";
-  });
-  const conclusion = failures.length > 0 ? "failure" : "success";
   const title = `${annotations.length} result(s) found by grep`;
   const summary = "";
 

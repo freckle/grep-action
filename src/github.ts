@@ -32,7 +32,7 @@ export async function createCheck(
   client: ClientType,
   name: string,
   annotations: Annotation[],
-  conclusion: string
+  conclusion: string,
 ): Promise<void> {
   const pullRequest = github.context.payload.pull_request;
   const head_sha = pullRequest?.head.sha ?? github.context.sha;
@@ -78,16 +78,15 @@ type ListFilesResponse =
   RestEndpointMethodTypes["pulls"]["listFiles"]["response"]["data"];
 
 export async function listPullRequestFiles(
-  client: ClientType
+  client: ClientType,
 ): Promise<string[]> {
   const listFilesOptions = client.rest.pulls.listFiles.endpoint.merge({
     ...github.context.repo,
     pull_number: github.context.issue.number,
   });
 
-  const listFilesResponse: ListFilesResponse = await client.paginate(
-    listFilesOptions
-  );
+  const listFilesResponse: ListFilesResponse =
+    await client.paginate(listFilesOptions);
 
   return listFilesResponse.map((f) => f.filename);
 }

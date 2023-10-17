@@ -61,13 +61,13 @@ export class Reporter {
   async onFinish(client: ClientType): Promise<void> {
     if (this.createNewCheck) {
       core.info(
-        `Creating Check result with ${this.annotations.length} annotation(s)`
+        `Creating Check result with ${this.annotations.length} annotation(s)`,
       );
       return await github.createCheck(
         client,
         "Grep results",
         this.annotations,
-        this.conclusion
+        this.conclusion,
       );
     }
 

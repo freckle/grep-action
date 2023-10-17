@@ -37,10 +37,12 @@ async function run() {
     const patterns = config.loadPatterns(
       core.getInput("patterns", { required: true })
     );
-    const onlyChanged =
-      core.getInput("only-changed", { required: true }).toUpperCase() == "TRUE";
-    const createNewCheck =
-      core.getInput("create-new-check", { required: true }).toUpperCase() == "TRUE";
+    const onlyChanged = core.getBooleanInput("only-changed", {
+      required: true,
+    });
+    const createNewCheck = core.getBooleanInput("create-new-check", {
+      required: true,
+    });
 
     core.info(
       `patterns: [${patterns.map((p) => p.pattern.toString()).join(", ")}]`

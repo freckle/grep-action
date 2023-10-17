@@ -25,7 +25,7 @@ jobs:
                 - "src/**/*.test.ts"
 
               # Must be notice|warning|failure
-              level: warning
+              level: failure
 
               # Limit 255 characters
               title: "Use of setFailed is considered harmful"

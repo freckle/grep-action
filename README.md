@@ -57,7 +57,7 @@ jobs:
               title: A brief title
 
               message: |
-               A longer message body
+                A longer message body
 ```
 
 ## Inputs

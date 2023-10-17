@@ -14,6 +14,10 @@ inputs:
     description: "Create a new Check for our annotations?"
     required: true
     default: "false"
+  failure-threshold:
+    description: "Fail on any annotations at or above this level"
+    required: true
+    default: "failure"
   github-token:
     description: "Override GitHub token, if necessary"
     required: true

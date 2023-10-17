@@ -1,7 +1,7 @@
 import * as core from "@actions/core";
 import * as gh from "@actions/github";
 
-import type { Annotation } from "./github";
+import type { Annotation, AnnotationLevel } from "./github";
 import * as github from "./github";
 import type { GrepResult } from "./grep";
 import type { Pattern } from "./config";
@@ -10,13 +10,30 @@ type ClientType = ReturnType<typeof gh.getOctokit>;
 
 export class Reporter {
   createNewCheck: boolean;
+  failureThreshold: AnnotationLevel;
   annotations: Annotation[];
   conclusion: string;
 
-  constructor(createNewCheck: boolean) {
+  constructor(createNewCheck: boolean, failureThreshold: AnnotationLevel) {
     this.createNewCheck = createNewCheck;
+    this.failureThreshold = failureThreshold;
     this.annotations = [];
     this.conclusion = "success";
+  }
+
+  exceedsFailureThreshold(level: AnnotationLevel): boolean {
+    const numericLevel = (l: AnnotationLevel): number => {
+      switch (l) {
+        case "notice":
+          return 1;
+        case "warning":
+          return 2;
+        case "failure":
+          return 3;
+      }
+    };
+
+    return numericLevel(level) >= numericLevel(this.failureThreshold);
   }
 
   onResult(pattern: Pattern, result: GrepResult): void {
@@ -30,7 +47,7 @@ export class Reporter {
       raw_details: result.input,
     };
 
-    if (annotation.annotation_level == "failure") {
+    if (this.exceedsFailureThreshold(annotation.annotation_level)) {
       this.conclusion = "failure";
     }
 

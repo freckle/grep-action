@@ -4,6 +4,8 @@ restylers:
   - jq:
       enabled: false # prefer prettier-json
   - prettier:
+      image:
+        tag: v2.5
       include:
         - "src/**/*.ts"
   - whitespace:

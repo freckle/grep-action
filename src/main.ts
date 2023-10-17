@@ -39,6 +39,8 @@ async function run() {
     );
     const onlyChanged =
       core.getInput("only-changed", { required: true }).toUpperCase() == "TRUE";
+    const createNewCheck =
+      core.getInput("create-new-check", { required: true }).toUpperCase() == "TRUE";
 
     core.info(
       `patterns: [${patterns.map((p) => p.pattern.toString()).join(", ")}]`

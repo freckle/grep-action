@@ -10,6 +10,10 @@ inputs:
     description: "Only operate on changed files"
     required: true
     default: "true"
+  create-new-check:
+    description: "Create a new Check for our annotations?"
+    required: true
+    default: "false"
   github-token:
     description: "Override GitHub token, if necessary"
     required: true

@@ -9,10 +9,12 @@ import type { Pattern } from "./config";
 type ClientType = ReturnType<typeof gh.getOctokit>;
 
 export class Reporter {
+  createNewCheck: boolean;
   annotations: Annotation[];
   conclusion: string;
 
-  constructor() {
+  constructor(createNewCheck: boolean) {
+    this.createNewCheck = createNewCheck;
     this.annotations = [];
     this.conclusion = "success";
   }
@@ -33,10 +35,39 @@ export class Reporter {
     }
 
     this.annotations.push(annotation);
+
+    if (!this.createNewCheck) {
+      // Report the annotation here and now
+      const options = {
+        title: annotation.title,
+        file: annotation.path,
+        startLine: annotation.start_line,
+        endLine: annotation.end_line,
+      };
+
+      switch (annotation.annotation_level) {
+        case "notice":
+          core.notice(annotation.message, options);
+          break;
+        case "warning":
+          core.warning(annotation.message, options);
+          break;
+        case "failure":
+          core.error(annotation.message, options);
+          break;
+      }
     }
   }
 
   async onFinish(client: ClientType): Promise<void> {
+    if (!this.createNewCheck) {
+      // Fail the Job if appropriate, and stop here
+      if (this.conclusion === "failure") {
+        core.setFailed("Failing due to grep results");
+      }
+      return;
+    }
+
     core.info(
       `Creating Check result with ${this.annotations.length} annotation(s)`
     );

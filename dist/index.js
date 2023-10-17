@@ -140,20 +140,16 @@ function getClient(token) {
     return github.getOctokit(token);
 }
 exports.getClient = getClient;
-function createCheck(client, name, annotations) {
+function createCheck(client, name, annotations, conclusion) {
     var _a;
     return __awaiter(this, void 0, void 0, function () {
-        var pullRequest, head_sha, status, failures, conclusion, title, summary, resp, check_run_id, i, sliced;
+        var pullRequest, head_sha, status, title, summary, resp, check_run_id, i, sliced;
         return __generator(this, function (_b) {
             switch (_b.label) {
                 case 0:
                     pullRequest = github.context.payload.pull_request;
                     head_sha = (_a = pullRequest === null || pullRequest === void 0 ? void 0 : pullRequest.head.sha) !== null && _a !== void 0 ? _a : github.context.sha;
                     status = "completed";
-                    failures = annotations.filter(function (a) {
-                        return a.annotation_level === "failure";
-                    });
-                    conclusion = failures.length > 0 ? "failure" : "success";
                     title = "".concat(annotations.length, " result(s) found by grep");
                     summary = "";
                     return [4, client.rest.checks.create(__assign(__assign({}, github.context.repo), { name: name, head_sha: head_sha, status: status, conclusion: conclusion, output: {
@@ -413,6 +409,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 var path_1 = __nccwpck_require__(1017);
 var core = __importStar(__nccwpck_require__(2186));
 var glob = __importStar(__nccwpck_require__(8090));
+var reporter_1 = __nccwpck_require__(2110);
 var config = __importStar(__nccwpck_require__(88));
 var github = __importStar(__nccwpck_require__(5928));
 var grep_1 = __nccwpck_require__(4938);
@@ -441,28 +438,22 @@ function getFiles(onlyChanged, changedFiles, pattern) {
         });
     });
 }
-function toAnnotation(pattern, result) {
-    return {
-        path: result.path,
-        start_line: result.line,
-        end_line: result.line,
-        annotation_level: pattern.level,
-        message: pattern.message || "Flagged in freckle/grep-action",
-        title: pattern.title || "",
-        raw_details: result.input,
-    };
-}
 function run() {
     return __awaiter(this, void 0, void 0, function () {
-        var token, patterns, onlyChanged, client, changedFiles, _a, annotations_1, _loop_1, _i, patterns_1, pattern, error_1;
+        var token, patterns, onlyChanged, createNewCheck, client, changedFiles, _a, reporter_2, _loop_1, _i, patterns_1, pattern, error_1;
         return __generator(this, function (_b) {
             switch (_b.label) {
                 case 0:
-                    _b.trys.push([0, 9, , 10]);
+                    _b.trys.push([0, 8, , 9]);
                     core.startGroup("Inputs");
                     token = core.getInput("github-token", { required: true });
                     patterns = config.loadPatterns(core.getInput("patterns", { required: true }));
-                    onlyChanged = core.getInput("only-changed", { required: true }).toUpperCase() == "TRUE";
+                    onlyChanged = core.getBooleanInput("only-changed", {
+                        required: true,
+                    });
+                    createNewCheck = core.getBooleanInput("create-new-check", {
+                        required: true,
+                    });
                     core.info("patterns: [".concat(patterns.map(function (p) { return p.pattern.toString(); }).join(", "), "]"));
                     core.info("only-changed: ".concat(onlyChanged));
                     core.endGroup();
@@ -480,7 +471,7 @@ function run() {
                     if (onlyChanged) {
                         core.info("Fetched ".concat(changedFiles.length, " changed file(s)"));
                     }
-                    annotations_1 = [];
+                    reporter_2 = new reporter_1.Reporter(createNewCheck);
                     _loop_1 = function (pattern) {
                         var files, results;
                         return __generator(this, function (_c) {
@@ -498,7 +489,7 @@ function run() {
                                     results = _c.sent();
                                     core.info("".concat(results.length, " result(s)"));
                                     results.forEach(function (result) {
-                                        annotations_1.push(toAnnotation(pattern, result));
+                                        reporter_2.onResult(pattern, result);
                                     });
                                     core.endGroup();
                                     _c.label = 3;
@@ -519,12 +510,9 @@ function run() {
                     _i++;
                     return [3, 4];
                 case 7:
-                    core.info("Creating Check result with ".concat(annotations_1.length, " annotation(s)"));
-                    return [4, github.createCheck(client, "Grep results", annotations_1)];
+                    reporter_2.onFinish(client);
+                    return [3, 9];
                 case 8:
-                    _b.sent();
-                    return [3, 10];
-                case 9:
                     error_1 = _b.sent();
                     if (error_1 instanceof Error) {
                         core.error(error_1);
@@ -538,13 +526,142 @@ function run() {
                         core.error("Non-Error exception");
                         core.setFailed("Non-Error exception");
                     }
-                    return [3, 10];
-                case 10: return [2];
+                    return [3, 9];
+                case 9: return [2];
             }
         });
     });
 }
 run();
+
+
+/***/ }),
+
+/***/ 2110:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __generator = (this && this.__generator) || function (thisArg, body) {
+    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
+    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
+    function verb(n) { return function (v) { return step([n, v]); }; }
+    function step(op) {
+        if (f) throw new TypeError("Generator is already executing.");
+        while (_) try {
+            if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
+            if (y = 0, t) op = [op[0] & 2, t.value];
+            switch (op[0]) {
+                case 0: case 1: t = op; break;
+                case 4: _.label++; return { value: op[1], done: false };
+                case 5: _.label++; y = op[1]; op = [0]; continue;
+                case 7: op = _.ops.pop(); _.trys.pop(); continue;
+                default:
+                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
+                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
+                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
+                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
+                    if (t[2]) _.ops.pop();
+                    _.trys.pop(); continue;
+            }
+            op = body.call(thisArg, _);
+        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
+        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
+    }
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.Reporter = void 0;
+var core = __importStar(__nccwpck_require__(2186));
+var github = __importStar(__nccwpck_require__(5928));
+var Reporter = (function () {
+    function Reporter(createNewCheck) {
+        this.createNewCheck = createNewCheck;
+        this.annotations = [];
+        this.conclusion = "success";
+    }
+    Reporter.prototype.onResult = function (pattern, result) {
+        var annotation = {
+            path: result.path,
+            start_line: result.line,
+            end_line: result.line,
+            annotation_level: pattern.level,
+            message: pattern.message || "Flagged in freckle/grep-action",
+            title: pattern.title || "",
+            raw_details: result.input,
+        };
+        if (annotation.annotation_level == "failure") {
+            this.conclusion = "failure";
+        }
+        this.annotations.push(annotation);
+        if (!this.createNewCheck) {
+            var options = {
+                title: annotation.title,
+                file: annotation.path,
+                startLine: annotation.start_line,
+                endLine: annotation.end_line,
+            };
+            switch (annotation.annotation_level) {
+                case "notice":
+                    core.notice(annotation.message, options);
+                    break;
+                case "warning":
+                    core.warning(annotation.message, options);
+                    break;
+                case "failure":
+                    core.error(annotation.message, options);
+                    break;
+            }
+        }
+    };
+    Reporter.prototype.onFinish = function (client) {
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        if (!this.createNewCheck) {
+                            if (this.conclusion === "failure") {
+                                core.setFailed("Failing due to grep results");
+                            }
+                            return [2];
+                        }
+                        core.info("Creating Check result with ".concat(this.annotations.length, " annotation(s)"));
+                        return [4, github.createCheck(client, "Grep results", this.annotations, this.conclusion)];
+                    case 1: return [2, _a.sent()];
+                }
+            });
+        });
+    };
+    return Reporter;
+}());
+exports.Reporter = Reporter;
 
 
 /***/ }),

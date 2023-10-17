@@ -6,6 +6,7 @@ import * as glob from "@actions/glob";
 import { Reporter } from "./reporter";
 import type { Pattern } from "./config";
 import * as config from "./config";
+import type { AnnotationLevel } from "./github";
 import * as github from "./github";
 import { grep } from "./grep";
 
@@ -43,6 +44,9 @@ async function run() {
     const createNewCheck = core.getBooleanInput("create-new-check", {
       required: true,
     });
+    const failureThreshold = core.getInput("failure-threshold", {
+      required: true,
+    }) as AnnotationLevel;
 
     core.info(
       `patterns: [${patterns.map((p) => p.pattern.toString()).join(", ")}]`
@@ -60,7 +64,7 @@ async function run() {
       core.info(`Fetched ${changedFiles.length} changed file(s)`);
     }
 
-    const reporter = new Reporter(createNewCheck);
+    const reporter = new Reporter(createNewCheck, failureThreshold);
 
     for (const pattern of patterns) {
       const files = await getFiles(onlyChanged, changedFiles, pattern);

@@ -69,6 +69,14 @@ jobs:
 
   **NOTE**: This action doesn't really work on non-`pull_request` events.
 
+- `create-new-check`: If `true`, a new Check is created and the annotations are
+  attached to it. Default is `false`, which means to log the annotations
+  normally.
+
+- `failure-threshold`: If any annotations are created at or above this level,
+  the run will fail. See `patterns[].level` for valid values. Default is
+  `failure`.
+
 - `github-token`: override the default `GITHUB_TOKEN`, if desired.
 
 See [`./action.yml`](./action.yml) for complete details.

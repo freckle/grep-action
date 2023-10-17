@@ -440,7 +440,7 @@ function getFiles(onlyChanged, changedFiles, pattern) {
 }
 function run() {
     return __awaiter(this, void 0, void 0, function () {
-        var token, patterns, onlyChanged, createNewCheck, client, changedFiles, _a, reporter_2, _loop_1, _i, patterns_1, pattern, error_1;
+        var token, patterns, onlyChanged, createNewCheck, failureThreshold, client, changedFiles, _a, reporter_2, _loop_1, _i, patterns_1, pattern, error_1;
         return __generator(this, function (_b) {
             switch (_b.label) {
                 case 0:
@@ -452,6 +452,9 @@ function run() {
                         required: true,
                     });
                     createNewCheck = core.getBooleanInput("create-new-check", {
+                        required: true,
+                    });
+                    failureThreshold = core.getInput("failure-threshold", {
                         required: true,
                     });
                     core.info("patterns: [".concat(patterns.map(function (p) { return p.pattern.toString(); }).join(", "), "]"));
@@ -471,7 +474,7 @@ function run() {
                     if (onlyChanged) {
                         core.info("Fetched ".concat(changedFiles.length, " changed file(s)"));
                     }
-                    reporter_2 = new reporter_1.Reporter(createNewCheck);
+                    reporter_2 = new reporter_1.Reporter(createNewCheck, failureThreshold);
                     _loop_1 = function (pattern) {
                         var files, results;
                         return __generator(this, function (_c) {
@@ -602,11 +605,25 @@ exports.Reporter = void 0;
 var core = __importStar(__nccwpck_require__(2186));
 var github = __importStar(__nccwpck_require__(5928));
 var Reporter = (function () {
-    function Reporter(createNewCheck) {
+    function Reporter(createNewCheck, failureThreshold) {
         this.createNewCheck = createNewCheck;
+        this.failureThreshold = failureThreshold;
         this.annotations = [];
         this.conclusion = "success";
     }
+    Reporter.prototype.exceedsFailureThreshold = function (level) {
+        var numericLevel = function (l) {
+            switch (l) {
+                case "notice":
+                    return 1;
+                case "warning":
+                    return 2;
+                case "failure":
+                    return 3;
+            }
+        };
+        return numericLevel(level) >= numericLevel(this.failureThreshold);
+    };
     Reporter.prototype.onResult = function (pattern, result) {
         var annotation = {
             path: result.path,
@@ -617,7 +634,7 @@ var Reporter = (function () {
             title: pattern.title || "",
             raw_details: result.input,
         };
-        if (annotation.annotation_level == "failure") {
+        if (this.exceedsFailureThreshold(annotation.annotation_level)) {
             this.conclusion = "failure";
         }
         this.annotations.push(annotation);

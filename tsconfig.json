@@ -1,8 +1,9 @@
 {
+  "$schema": "https://json.schemastore.org/tsconfig",
   "compilerOptions": {
     "outDir": "./lib",
     "allowJs": true,
-    "target": "es5",
+    "target": "ES2022",
     "noImplicitAny": true,
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
@@ -12,7 +13,7 @@
     "allowUnusedLabels": false,
     "noEmitOnError": true,
     "removeComments": true,
-    "module": "CommonJS",
+    "module": "NodeNext",
     "esModuleInterop": true,
     "strict": true
   },

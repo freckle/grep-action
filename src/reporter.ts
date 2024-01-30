@@ -1,7 +1,7 @@
 import * as core from "@actions/core";
 import * as gh from "@actions/github";
 
-import type { Annotation, AnnotationLevel } from "./github";
+import type { Annotation, AnnotationLevel, Conclusion } from "./github";
 import * as github from "./github";
 import type { GrepResult } from "./grep";
 import type { Pattern } from "./config";
@@ -12,7 +12,7 @@ export class Reporter {
   createNewCheck: boolean;
   failureThreshold: AnnotationLevel;
   annotations: Annotation[];
-  conclusion: string;
+  conclusion: Conclusion;
 
   constructor(createNewCheck: boolean, failureThreshold: AnnotationLevel) {
     this.createNewCheck = createNewCheck;
@@ -86,13 +86,13 @@ export class Reporter {
     }
 
     core.info(
-      `Creating Check result with ${this.annotations.length} annotation(s)`
+      `Creating Check result with ${this.annotations.length} annotation(s)`,
     );
     return await github.createCheck(
       client,
       "Grep results",
       this.annotations,
-      this.conclusion
+      this.conclusion,
     );
   }
 }

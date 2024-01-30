@@ -31,33 +31,33 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.matchesAny = exports.loadPatterns = void 0;
-var yaml = __importStar(__nccwpck_require__(1917));
-var minimatch_1 = __nccwpck_require__(3973);
+const yaml = __importStar(__nccwpck_require__(1917));
+const minimatch_1 = __nccwpck_require__(3973);
 function fromPatternYaml(patternYaml) {
-    var pattern = patternYaml.pattern, syntax = patternYaml.syntax, paths = patternYaml.paths, level = patternYaml.level, title = patternYaml.title, message = patternYaml.message;
-    var pathsIgnore = patternYaml["paths-ignore"];
-    var binaryFiles = patternYaml["binary-files"];
+    const { pattern, syntax, paths, level, title, message } = patternYaml;
+    const pathsIgnore = patternYaml["paths-ignore"];
+    const binaryFiles = patternYaml["binary-files"];
     return {
-        pattern: pattern,
+        pattern,
         syntax: syntax || "basic",
         binaryFiles: binaryFiles || "binary",
         paths: paths || ["**/*"],
         pathsIgnore: pathsIgnore || [],
         level: level || "notice",
-        title: title,
+        title,
         message: message === undefined ? null : message,
     };
 }
 function loadPatterns(input) {
-    var patternsYaml = yaml.load(input);
+    const patternsYaml = yaml.load(input);
     return patternsYaml.map(fromPatternYaml);
 }
 exports.loadPatterns = loadPatterns;
 function matchesAny(pattern, file) {
-    var keepMatchers = pattern.paths.map(function (p) { return new minimatch_1.Minimatch(p); });
-    var discardMatchers = pattern.pathsIgnore.map(function (p) { return new minimatch_1.Minimatch(p); });
-    return (keepMatchers.some(function (m) { return m.match(file); }) &&
-        !discardMatchers.some(function (m) { return m.match(file); }));
+    const keepMatchers = pattern.paths.map((p) => new minimatch_1.Minimatch(p));
+    const discardMatchers = pattern.pathsIgnore.map((p) => new minimatch_1.Minimatch(p));
+    return (keepMatchers.some((m) => m.match(file)) &&
+        !discardMatchers.some((m) => m.match(file)));
 }
 exports.matchesAny = matchesAny;
 
@@ -69,17 +69,6 @@ exports.matchesAny = matchesAny;
 
 "use strict";
 
-var __assign = (this && this.__assign) || function () {
-    __assign = Object.assign || function(t) {
-        for (var s, i = 1, n = arguments.length; i < n; i++) {
-            s = arguments[i];
-            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
-                t[p] = s[p];
-        }
-        return t;
-    };
-    return __assign.apply(this, arguments);
-};
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     var desc = Object.getOwnPropertyDescriptor(m, k);
@@ -103,108 +92,56 @@ var __importStar = (this && this.__importStar) || function (mod) {
     __setModuleDefault(result, mod);
     return result;
 };
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-var __generator = (this && this.__generator) || function (thisArg, body) {
-    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
-    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
-    function verb(n) { return function (v) { return step([n, v]); }; }
-    function step(op) {
-        if (f) throw new TypeError("Generator is already executing.");
-        while (g && (g = 0, op[0] && (_ = 0)), _) try {
-            if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
-            if (y = 0, t) op = [op[0] & 2, t.value];
-            switch (op[0]) {
-                case 0: case 1: t = op; break;
-                case 4: _.label++; return { value: op[1], done: false };
-                case 5: _.label++; y = op[1]; op = [0]; continue;
-                case 7: op = _.ops.pop(); _.trys.pop(); continue;
-                default:
-                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
-                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
-                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
-                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
-                    if (t[2]) _.ops.pop();
-                    _.trys.pop(); continue;
-            }
-            op = body.call(thisArg, _);
-        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
-        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
-    }
-};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.listPullRequestFiles = exports.createCheck = exports.getClient = void 0;
-var core = __importStar(__nccwpck_require__(2186));
-var github = __importStar(__nccwpck_require__(5438));
-var MAX_ANNOTATIONS = 50;
+const core = __importStar(__nccwpck_require__(2186));
+const github = __importStar(__nccwpck_require__(5438));
+const MAX_ANNOTATIONS = 50;
 function getClient(token) {
     return github.getOctokit(token);
 }
 exports.getClient = getClient;
-function createCheck(client, name, annotations, conclusion) {
-    var _a;
-    return __awaiter(this, void 0, void 0, function () {
-        var pullRequest, head_sha, status, title, summary, resp, check_run_id, i, sliced;
-        return __generator(this, function (_b) {
-            switch (_b.label) {
-                case 0:
-                    pullRequest = github.context.payload.pull_request;
-                    head_sha = (_a = pullRequest === null || pullRequest === void 0 ? void 0 : pullRequest.head.sha) !== null && _a !== void 0 ? _a : github.context.sha;
-                    status = "completed";
-                    title = "".concat(annotations.length, " result(s) found by grep");
-                    summary = "";
-                    return [4, client.rest.checks.create(__assign(__assign({}, github.context.repo), { name: name, head_sha: head_sha, status: status, conclusion: conclusion, output: {
-                                title: title,
-                                summary: summary,
-                                annotations: annotations.slice(0, MAX_ANNOTATIONS),
-                            } }))];
-                case 1:
-                    resp = _b.sent();
-                    check_run_id = resp.data.id;
-                    i = MAX_ANNOTATIONS;
-                    _b.label = 2;
-                case 2:
-                    if (!(i < annotations.length)) return [3, 5];
-                    sliced = annotations.slice(i, i + MAX_ANNOTATIONS);
-                    core.info("Updating Check with ".concat(sliced.length, " more annotation(s)"));
-                    return [4, client.rest.checks.update(__assign(__assign({}, github.context.repo), { check_run_id: check_run_id, output: {
-                                title: title,
-                                summary: summary,
-                                annotations: annotations.slice(i, i + MAX_ANNOTATIONS),
-                            } }))];
-                case 3:
-                    _b.sent();
-                    _b.label = 4;
-                case 4:
-                    i = i + MAX_ANNOTATIONS;
-                    return [3, 2];
-                case 5: return [2];
-            }
-        });
+async function createCheck(client, name, annotations, conclusion) {
+    const pullRequest = github.context.payload.pull_request;
+    const head_sha = pullRequest?.head.sha ?? github.context.sha;
+    const status = "completed";
+    const title = `${annotations.length} result(s) found by grep`;
+    const summary = "";
+    const resp = await client.rest.checks.create({
+        ...github.context.repo,
+        name,
+        head_sha,
+        status,
+        conclusion,
+        output: {
+            title,
+            summary,
+            annotations: annotations.slice(0, MAX_ANNOTATIONS),
+        },
     });
+    const check_run_id = resp.data.id;
+    for (let i = MAX_ANNOTATIONS; i < annotations.length; i = i + MAX_ANNOTATIONS) {
+        const sliced = annotations.slice(i, i + MAX_ANNOTATIONS);
+        core.info(`Updating Check with ${sliced.length} more annotation(s)`);
+        await client.rest.checks.update({
+            ...github.context.repo,
+            check_run_id,
+            output: {
+                title,
+                summary,
+                annotations: annotations.slice(i, i + MAX_ANNOTATIONS),
+            },
+        });
+    }
 }
 exports.createCheck = createCheck;
-function listPullRequestFiles(client) {
-    return __awaiter(this, void 0, void 0, function () {
-        var listFilesOptions, listFilesResponse;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    listFilesOptions = client.rest.pulls.listFiles.endpoint.merge(__assign(__assign({}, github.context.repo), { pull_number: github.context.issue.number }));
-                    return [4, client.paginate(listFilesOptions)];
-                case 1:
-                    listFilesResponse = _a.sent();
-                    return [2, listFilesResponse.map(function (f) { return f.filename; })];
-            }
-        });
+async function listPullRequestFiles(client) {
+    const listFilesOptions = client.rest.pulls.listFiles.endpoint.merge({
+        ...github.context.repo,
+        pull_number: github.context.issue.number,
     });
+    const listFilesResponse = await client.paginate(listFilesOptions);
+    return listFilesResponse.map((f) => f.filename);
 }
 exports.listPullRequestFiles = listPullRequestFiles;
 
@@ -239,45 +176,9 @@ var __importStar = (this && this.__importStar) || function (mod) {
     __setModuleDefault(result, mod);
     return result;
 };
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-var __generator = (this && this.__generator) || function (thisArg, body) {
-    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
-    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
-    function verb(n) { return function (v) { return step([n, v]); }; }
-    function step(op) {
-        if (f) throw new TypeError("Generator is already executing.");
-        while (g && (g = 0, op[0] && (_ = 0)), _) try {
-            if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
-            if (y = 0, t) op = [op[0] & 2, t.value];
-            switch (op[0]) {
-                case 0: case 1: t = op; break;
-                case 4: _.label++; return { value: op[1], done: false };
-                case 5: _.label++; y = op[1]; op = [0]; continue;
-                case 7: op = _.ops.pop(); _.trys.pop(); continue;
-                default:
-                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
-                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
-                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
-                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
-                    if (t[2]) _.ops.pop();
-                    _.trys.pop(); continue;
-            }
-            op = body.call(thisArg, _);
-        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
-        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
-    }
-};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.parseGrep = exports.grep = void 0;
-var exec = __importStar(__nccwpck_require__(1514));
+const exec = __importStar(__nccwpck_require__(1514));
 function grepSyntaxOption(syntax) {
     switch (syntax) {
         case "extended":
@@ -300,58 +201,47 @@ function grepBinaryFilesOption(syntax) {
             return "--binary-files=text";
     }
 }
-function grep(pattern, files, _a) {
-    var syntax = _a.syntax, binaryFiles = _a.binaryFiles, _b = _a.silent, silent = _b === void 0 ? false : _b;
-    return __awaiter(this, void 0, void 0, function () {
-        var stdout, grepArgs;
-        return __generator(this, function (_c) {
-            switch (_c.label) {
-                case 0:
-                    stdout = "";
-                    files.push("/dev/null");
-                    grepArgs = [
-                        "--line-number",
-                        "--color=never",
-                        grepSyntaxOption(syntax),
-                        grepBinaryFilesOption(binaryFiles),
-                        pattern,
-                    ].concat(files);
-                    return [4, exec.exec("grep", grepArgs, {
-                            listeners: {
-                                stdout: function (data) {
-                                    stdout += data.toString();
-                                },
-                            },
-                            ignoreReturnCode: true,
-                            silent: silent,
-                        })];
-                case 1:
-                    _c.sent();
-                    return [2, parseGrep(stdout)];
-            }
-        });
+async function grep(pattern, files, { syntax, binaryFiles, silent = false }) {
+    let stdout = "";
+    files.push("/dev/null");
+    const grepArgs = [
+        "--line-number",
+        "--color=never",
+        grepSyntaxOption(syntax),
+        grepBinaryFilesOption(binaryFiles),
+        pattern,
+    ].concat(files);
+    await exec.exec("grep", grepArgs, {
+        listeners: {
+            stdout: (data) => {
+                stdout += data.toString();
+            },
+        },
+        ignoreReturnCode: true,
+        silent,
     });
+    return parseGrep(stdout);
 }
 exports.grep = grep;
 function parseGrep(stdout) {
     return stdout
         .split("\n")
         .map(parseGrepLine)
-        .filter(function (x) { return x !== null; });
+        .filter((x) => x !== null);
 }
 exports.parseGrep = parseGrep;
 function parseGrepLine(input) {
-    var regex = /^(?<path>[^:]+):(?<line>[0-9]+):.*$/;
-    var match = input.match(regex);
+    const regex = /^(?<path>[^:]+):(?<line>[0-9]+):.*$/;
+    const match = input.match(regex);
     if (match === null || match.groups === undefined) {
         return null;
     }
-    var path = match.groups.path;
-    var line = parseInt(match.groups.line, 10);
+    const path = match.groups.path;
+    const line = parseInt(match.groups.line, 10);
     if (isNaN(line)) {
         return null;
     }
-    return { input: input, path: path, line: line };
+    return { input, path, line };
 }
 
 
@@ -385,171 +275,86 @@ var __importStar = (this && this.__importStar) || function (mod) {
     __setModuleDefault(result, mod);
     return result;
 };
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-var __generator = (this && this.__generator) || function (thisArg, body) {
-    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
-    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
-    function verb(n) { return function (v) { return step([n, v]); }; }
-    function step(op) {
-        if (f) throw new TypeError("Generator is already executing.");
-        while (g && (g = 0, op[0] && (_ = 0)), _) try {
-            if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
-            if (y = 0, t) op = [op[0] & 2, t.value];
-            switch (op[0]) {
-                case 0: case 1: t = op; break;
-                case 4: _.label++; return { value: op[1], done: false };
-                case 5: _.label++; y = op[1]; op = [0]; continue;
-                case 7: op = _.ops.pop(); _.trys.pop(); continue;
-                default:
-                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
-                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
-                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
-                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
-                    if (t[2]) _.ops.pop();
-                    _.trys.pop(); continue;
-            }
-            op = body.call(thisArg, _);
-        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
-        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
-    }
-};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-var path_1 = __nccwpck_require__(1017);
-var core = __importStar(__nccwpck_require__(2186));
-var glob = __importStar(__nccwpck_require__(8090));
-var reporter_1 = __nccwpck_require__(2110);
-var config = __importStar(__nccwpck_require__(88));
-var github = __importStar(__nccwpck_require__(5928));
-var grep_1 = __nccwpck_require__(4938);
-function getFiles(onlyChanged, changedFiles, pattern) {
-    return __awaiter(this, void 0, void 0, function () {
-        var globber, paths;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    if (!onlyChanged) return [3, 1];
-                    return [2, changedFiles.filter(function (file) {
-                            return config.matchesAny(pattern, file);
-                        })];
-                case 1: return [4, glob.create(pattern.paths.join("\n"))];
-                case 2:
-                    globber = _a.sent();
-                    return [4, globber.glob()];
-                case 3:
-                    paths = _a.sent();
-                    return [2, paths
-                            .map(function (p) { return (0, path_1.relative)(process.cwd(), p); })
-                            .filter(function (file) {
-                            return config.matchesAny(pattern, file);
-                        })];
-            }
+const path_1 = __nccwpck_require__(1017);
+const core = __importStar(__nccwpck_require__(2186));
+const glob = __importStar(__nccwpck_require__(8090));
+const reporter_1 = __nccwpck_require__(2110);
+const config = __importStar(__nccwpck_require__(88));
+const github = __importStar(__nccwpck_require__(5928));
+const grep_1 = __nccwpck_require__(4938);
+async function getFiles(onlyChanged, changedFiles, pattern) {
+    if (onlyChanged) {
+        return changedFiles.filter((file) => {
+            return config.matchesAny(pattern, file);
         });
-    });
+    }
+    else {
+        const globber = await glob.create(pattern.paths.join("\n"));
+        const paths = await globber.glob();
+        return paths
+            .map((p) => (0, path_1.relative)(process.cwd(), p))
+            .filter((file) => {
+            return config.matchesAny(pattern, file);
+        });
+    }
 }
-function run() {
-    return __awaiter(this, void 0, void 0, function () {
-        var token, patterns, onlyChanged, createNewCheck, failureThreshold, client, changedFiles, _a, reporter_2, _loop_1, _i, patterns_1, pattern, error_1;
-        return __generator(this, function (_b) {
-            switch (_b.label) {
-                case 0:
-                    _b.trys.push([0, 8, , 9]);
-                    core.startGroup("Inputs");
-                    token = core.getInput("github-token", { required: true });
-                    patterns = config.loadPatterns(core.getInput("patterns", { required: true }));
-                    onlyChanged = core.getBooleanInput("only-changed", {
-                        required: true,
-                    });
-                    createNewCheck = core.getBooleanInput("create-new-check", {
-                        required: true,
-                    });
-                    failureThreshold = core.getInput("failure-threshold", {
-                        required: true,
-                    });
-                    core.info("patterns: [".concat(patterns.map(function (p) { return p.pattern.toString(); }).join(", "), "]"));
-                    core.info("only-changed: ".concat(onlyChanged));
-                    core.endGroup();
-                    client = github.getClient(token);
-                    if (!onlyChanged) return [3, 2];
-                    return [4, github.listPullRequestFiles(client)];
-                case 1:
-                    _a = _b.sent();
-                    return [3, 3];
-                case 2:
-                    _a = [];
-                    _b.label = 3;
-                case 3:
-                    changedFiles = _a;
-                    if (onlyChanged) {
-                        core.info("Fetched ".concat(changedFiles.length, " changed file(s)"));
-                    }
-                    reporter_2 = new reporter_1.Reporter(createNewCheck, failureThreshold);
-                    _loop_1 = function (pattern) {
-                        var files, results;
-                        return __generator(this, function (_c) {
-                            switch (_c.label) {
-                                case 0: return [4, getFiles(onlyChanged, changedFiles, pattern)];
-                                case 1:
-                                    files = _c.sent();
-                                    if (!(files.length !== 0)) return [3, 3];
-                                    core.startGroup("grep \"".concat(pattern.pattern, "\""));
-                                    return [4, (0, grep_1.grep)(pattern.pattern, files, {
-                                            syntax: pattern.syntax,
-                                            binaryFiles: pattern.binaryFiles,
-                                        })];
-                                case 2:
-                                    results = _c.sent();
-                                    core.info("".concat(results.length, " result(s)"));
-                                    results.forEach(function (result) {
-                                        reporter_2.onResult(pattern, result);
-                                    });
-                                    core.endGroup();
-                                    _c.label = 3;
-                                case 3: return [2];
-                            }
-                        });
-                    };
-                    _i = 0, patterns_1 = patterns;
-                    _b.label = 4;
-                case 4:
-                    if (!(_i < patterns_1.length)) return [3, 7];
-                    pattern = patterns_1[_i];
-                    return [5, _loop_1(pattern)];
-                case 5:
-                    _b.sent();
-                    _b.label = 6;
-                case 6:
-                    _i++;
-                    return [3, 4];
-                case 7:
-                    reporter_2.onFinish(client);
-                    return [3, 9];
-                case 8:
-                    error_1 = _b.sent();
-                    if (error_1 instanceof Error) {
-                        core.error(error_1);
-                        core.setFailed(error_1.message);
-                    }
-                    else if (typeof error_1 === "string") {
-                        core.error(error_1);
-                        core.setFailed(error_1);
-                    }
-                    else {
-                        core.error("Non-Error exception");
-                        core.setFailed("Non-Error exception");
-                    }
-                    return [3, 9];
-                case 9: return [2];
-            }
+async function run() {
+    try {
+        core.startGroup("Inputs");
+        const token = core.getInput("github-token", { required: true });
+        const patterns = config.loadPatterns(core.getInput("patterns", { required: true }));
+        const onlyChanged = core.getBooleanInput("only-changed", {
+            required: true,
         });
-    });
+        const createNewCheck = core.getBooleanInput("create-new-check", {
+            required: true,
+        });
+        const failureThreshold = core.getInput("failure-threshold", {
+            required: true,
+        });
+        core.info(`patterns: [${patterns.map((p) => p.pattern.toString()).join(", ")}]`);
+        core.info(`only-changed: ${onlyChanged}`);
+        core.endGroup();
+        const client = github.getClient(token);
+        const changedFiles = onlyChanged
+            ? await github.listPullRequestFiles(client)
+            : [];
+        if (onlyChanged) {
+            core.info(`Fetched ${changedFiles.length} changed file(s)`);
+        }
+        const reporter = new reporter_1.Reporter(createNewCheck, failureThreshold);
+        for (const pattern of patterns) {
+            const files = await getFiles(onlyChanged, changedFiles, pattern);
+            if (files.length !== 0) {
+                core.startGroup(`grep "${pattern.pattern}"`);
+                const results = await (0, grep_1.grep)(pattern.pattern, files, {
+                    syntax: pattern.syntax,
+                    binaryFiles: pattern.binaryFiles,
+                });
+                core.info(`${results.length} result(s)`);
+                results.forEach((result) => {
+                    reporter.onResult(pattern, result);
+                });
+                core.endGroup();
+            }
+        }
+        reporter.onFinish(client);
+    }
+    catch (error) {
+        if (error instanceof Error) {
+            core.error(error);
+            core.setFailed(error.message);
+        }
+        else if (typeof error === "string") {
+            core.error(error);
+            core.setFailed(error);
+        }
+        else {
+            core.error("Non-Error exception");
+            core.setFailed("Non-Error exception");
+        }
+    }
 }
 run();
 
@@ -584,55 +389,23 @@ var __importStar = (this && this.__importStar) || function (mod) {
     __setModuleDefault(result, mod);
     return result;
 };
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-var __generator = (this && this.__generator) || function (thisArg, body) {
-    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
-    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
-    function verb(n) { return function (v) { return step([n, v]); }; }
-    function step(op) {
-        if (f) throw new TypeError("Generator is already executing.");
-        while (g && (g = 0, op[0] && (_ = 0)), _) try {
-            if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
-            if (y = 0, t) op = [op[0] & 2, t.value];
-            switch (op[0]) {
-                case 0: case 1: t = op; break;
-                case 4: _.label++; return { value: op[1], done: false };
-                case 5: _.label++; y = op[1]; op = [0]; continue;
-                case 7: op = _.ops.pop(); _.trys.pop(); continue;
-                default:
-                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
-                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
-                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
-                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
-                    if (t[2]) _.ops.pop();
-                    _.trys.pop(); continue;
-            }
-            op = body.call(thisArg, _);
-        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
-        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
-    }
-};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.Reporter = void 0;
-var core = __importStar(__nccwpck_require__(2186));
-var github = __importStar(__nccwpck_require__(5928));
-var Reporter = (function () {
-    function Reporter(createNewCheck, failureThreshold) {
+const core = __importStar(__nccwpck_require__(2186));
+const github = __importStar(__nccwpck_require__(5928));
+class Reporter {
+    createNewCheck;
+    failureThreshold;
+    annotations;
+    conclusion;
+    constructor(createNewCheck, failureThreshold) {
         this.createNewCheck = createNewCheck;
         this.failureThreshold = failureThreshold;
         this.annotations = [];
         this.conclusion = "success";
     }
-    Reporter.prototype.exceedsFailureThreshold = function (level) {
-        var numericLevel = function (l) {
+    exceedsFailureThreshold(level) {
+        const numericLevel = (l) => {
             switch (l) {
                 case "notice":
                     return 1;
@@ -643,9 +416,9 @@ var Reporter = (function () {
             }
         };
         return numericLevel(level) >= numericLevel(this.failureThreshold);
-    };
-    Reporter.prototype.onResult = function (pattern, result) {
-        var annotation = {
+    }
+    onResult(pattern, result) {
+        const annotation = {
             path: result.path,
             start_line: result.line,
             end_line: result.line,
@@ -659,7 +432,7 @@ var Reporter = (function () {
         }
         this.annotations.push(annotation);
         if (!this.createNewCheck) {
-            var options = {
+            const options = {
                 title: annotation.title,
                 file: annotation.path,
                 startLine: annotation.start_line,
@@ -677,27 +450,18 @@ var Reporter = (function () {
                     break;
             }
         }
-    };
-    Reporter.prototype.onFinish = function (client) {
-        return __awaiter(this, void 0, void 0, function () {
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0:
-                        if (!this.createNewCheck) {
-                            if (this.conclusion === "failure") {
-                                core.setFailed("Failing due to grep results");
-                            }
-                            return [2];
-                        }
-                        core.info("Creating Check result with ".concat(this.annotations.length, " annotation(s)"));
-                        return [4, github.createCheck(client, "Grep results", this.annotations, this.conclusion)];
-                    case 1: return [2, _a.sent()];
-                }
-            });
-        });
-    };
-    return Reporter;
-}());
+    }
+    async onFinish(client) {
+        if (!this.createNewCheck) {
+            if (this.conclusion === "failure") {
+                core.setFailed("Failing due to grep results");
+            }
+            return;
+        }
+        core.info(`Creating Check result with ${this.annotations.length} annotation(s)`);
+        return await github.createCheck(client, "Grep results", this.annotations, this.conclusion);
+    }
+}
 exports.Reporter = Reporter;
 
 

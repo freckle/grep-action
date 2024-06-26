@@ -20,7 +20,7 @@
     "@actions/exec": "^1.1.0",
     "@actions/github": "^6.0.0",
     "js-yaml": "^4.1.0",
-    "minimatch": "^9.0.4"
+    "minimatch": "^9.0.5"
   },
   "devDependencies": {
     "@actions/glob": "^0.4.0",

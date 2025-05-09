@@ -18,14 +18,17 @@
     "@actions/io" "^1.0.1"
 
 "@actions/github@^6.0.0":
-  version "6.0.0"
-  resolved "https://registry.yarnpkg.com/@actions/github/-/github-6.0.0.tgz#65883433f9d81521b782a64cc1fd45eef2191ea7"
-  integrity sha512-alScpSVnYmjNEXboZjarjukQEzgCRmjMv6Xj47fsdnqGS73bjJNDpiiXmp8jr0UZLdUB6d9jW63IcmddUP+l0g==
+  version "6.0.1"
+  resolved "https://registry.yarnpkg.com/@actions/github/-/github-6.0.1.tgz#76e5f96df062c90635a7181ef45ff1c4ac21306e"
+  integrity sha512-xbZVcaqD4XnQAe35qSQqskb3SqIAfRyLBrHMd/8TuL7hJSz2QtbDwnNM8zWx4zO5l2fnGtseNE3MbEvD7BxVMw==
   dependencies:
     "@actions/http-client" "^2.2.0"
     "@octokit/core" "^5.0.1"
-    "@octokit/plugin-paginate-rest" "^9.0.0"
-    "@octokit/plugin-rest-endpoint-methods" "^10.0.0"
+    "@octokit/plugin-paginate-rest" "^9.2.2"
+    "@octokit/plugin-rest-endpoint-methods" "^10.4.0"
+    "@octokit/request" "^8.4.1"
+    "@octokit/request-error" "^5.1.1"
+    undici "^5.28.5"
 
 "@actions/glob@^0.5.0":
   version "0.5.0"
@@ -35,10 +38,18 @@
     "@actions/core" "^1.9.1"
     minimatch "^3.0.4"
 
-"@actions/http-client@^2.0.1", "@actions/http-client@^2.2.0":
+"@actions/http-client@^2.0.1":
   version "2.2.0"
   resolved "https://registry.yarnpkg.com/@actions/http-client/-/http-client-2.2.0.tgz#f8239f375be6185fcd07765efdcf0031ad5df1a0"
   integrity sha512-q+epW0trjVUUHboliPb4UF9g2msf+w61b32tAkFEwL/IwP0DQWgbCMM0Hbe3e3WXSKz5VcUXbzJQgy8Hkra/Lg==
+  dependencies:
+    tunnel "^0.0.6"
+    undici "^5.25.4"
+
+"@actions/http-client@^2.2.0":
+  version "2.2.3"
+  resolved "https://registry.yarnpkg.com/@actions/http-client/-/http-client-2.2.3.tgz#31fc0b25c0e665754ed39a9f19a8611fc6dab674"
+  integrity sha512-mx8hyJi/hjFvbPokCg4uRd4ZX78t+YyRPtnKWwIl+RzNaVuFpQHfmlGVfsKEJN8LwTCvL+DfVgAM04XaHkm6bA==
   dependencies:
     tunnel "^0.0.6"
     undici "^5.25.4"
@@ -483,9 +494,9 @@
   integrity sha512-0hYQ8SB4Db5zvZB4axdMHGwEaQjkZzFjQiN9LVYvIFB2nSUHW9tYpxWriPrWDASIxiaXax83REcLxuSdnGPZtw==
 
 "@fastify/busboy@^2.0.0":
-  version "2.1.0"
-  resolved "https://registry.yarnpkg.com/@fastify/busboy/-/busboy-2.1.0.tgz#0709e9f4cb252351c609c6e6d8d6779a8d25edff"
-  integrity sha512-+KpH+QxZU7O4675t3mnkQKcZZg56u+K/Ct2K+N2AZYNVK8kyeo/bI18tI8aPm3tvNNRyTWfj6s5tnGNlcbQRsA==
+  version "2.1.1"
+  resolved "https://registry.yarnpkg.com/@fastify/busboy/-/busboy-2.1.1.tgz#b9da6a878a371829a0502c9b6c1c143ef6663f4d"
+  integrity sha512-vBZP4NlzfOlerQTnba4aqZoMhE/a9HY7HRqoOPaETQcSQuWEIyZMHGfVu6w9wGtGK5fED5qRs2DteVCjOH60sA==
 
 "@istanbuljs/load-nyc-config@^1.0.0":
   version "1.1.0"
@@ -755,15 +766,15 @@
   integrity sha512-tY/msAuJo6ARbK6SPIxZrPBms3xPbfwBrulZe0Wtr/DIY9lje2HeV1uoebShn6mx7SjCHif6EjMvoREj+gZ+SA==
 
 "@octokit/core@^5.0.1":
-  version "5.1.0"
-  resolved "https://registry.yarnpkg.com/@octokit/core/-/core-5.1.0.tgz#81dacf0197ed7855e6413f128bd6dd9e121e7d2f"
-  integrity sha512-BDa2VAMLSh3otEiaMJ/3Y36GU4qf6GI+VivQ/P41NC6GHcdxpKlqV0ikSZ5gdQsmS3ojXeRx5vasgNTinF0Q4g==
+  version "5.2.1"
+  resolved "https://registry.yarnpkg.com/@octokit/core/-/core-5.2.1.tgz#58c21a5f689ee81e0b883b5aa77573a7ff1b4ea1"
+  integrity sha512-dKYCMuPO1bmrpuogcjQ8z7ICCH3FP6WmxpwC03yjzGfZhj9fTJg6+bS1+UAplekbN2C+M61UNllGOOoAfGCrdQ==
   dependencies:
     "@octokit/auth-token" "^4.0.0"
-    "@octokit/graphql" "^7.0.0"
-    "@octokit/request" "^8.0.2"
-    "@octokit/request-error" "^5.0.0"
-    "@octokit/types" "^12.0.0"
+    "@octokit/graphql" "^7.1.0"
+    "@octokit/request" "^8.4.1"
+    "@octokit/request-error" "^5.1.1"
+    "@octokit/types" "^13.0.0"
     before-after-hook "^2.2.0"
     universal-user-agent "^6.0.0"
 
@@ -775,13 +786,13 @@
     "@octokit/types" "^13.1.0"
     universal-user-agent "^6.0.0"
 
-"@octokit/graphql@^7.0.0":
-  version "7.0.2"
-  resolved "https://registry.yarnpkg.com/@octokit/graphql/-/graphql-7.0.2.tgz#3df14b9968192f9060d94ed9e3aa9780a76e7f99"
-  integrity sha512-OJ2iGMtj5Tg3s6RaXH22cJcxXRi7Y3EBqbHTBRq+PQAqfaS8f/236fUrWhfSn8P4jovyzqucxme7/vWSSZBX2Q==
+"@octokit/graphql@^7.1.0":
+  version "7.1.1"
+  resolved "https://registry.yarnpkg.com/@octokit/graphql/-/graphql-7.1.1.tgz#79d9f3d0c96a8fd13d64186fe5c33606d48b79cc"
+  integrity sha512-3mkDltSfcDUoa176nlGoA32RGjeWjl3K7F/BwHwRMJUW/IteSa4bnSV8p2ThNkcIcZU2umkZWxwETSSCJf2Q7g==
   dependencies:
-    "@octokit/request" "^8.0.1"
-    "@octokit/types" "^12.0.0"
+    "@octokit/request" "^8.4.1"
+    "@octokit/types" "^13.0.0"
     universal-user-agent "^6.0.0"
 
 "@octokit/openapi-types@^20.0.0":
@@ -799,14 +810,14 @@
   resolved "https://registry.yarnpkg.com/@octokit/openapi-types/-/openapi-types-25.0.0.tgz#adeead36992abf966e89dcd53518d8b0dc910e0d"
   integrity sha512-FZvktFu7HfOIJf2BScLKIEYjDsw6RKc7rBJCdvCTfKsVnx2GEB/Nbzjr29DUdb7vQhlzS/j8qDzdditP0OC6aw==
 
-"@octokit/plugin-paginate-rest@^9.0.0":
+"@octokit/plugin-paginate-rest@^9.2.2":
   version "9.2.2"
   resolved "https://registry.yarnpkg.com/@octokit/plugin-paginate-rest/-/plugin-paginate-rest-9.2.2.tgz#c516bc498736bcdaa9095b9a1d10d9d0501ae831"
   integrity sha512-u3KYkGF7GcZnSD/3UP0S7K5XUFT2FkOQdcfXZGZQPGv3lm4F2Xbf71lvjldr8c1H3nNbF+33cLEkWYbokGWqiQ==
   dependencies:
     "@octokit/types" "^12.6.0"
 
-"@octokit/plugin-rest-endpoint-methods@^10.0.0":
+"@octokit/plugin-rest-endpoint-methods@^10.4.0":
   version "10.4.1"
   resolved "https://registry.yarnpkg.com/@octokit/plugin-rest-endpoint-methods/-/plugin-rest-endpoint-methods-10.4.1.tgz#41ba478a558b9f554793075b2e20cd2ef973be17"
   integrity sha512-xV1b+ceKV9KytQe3zCVqjg+8GTGfDYwaT1ATU5isiUyVtlVAO3HNdzpS4sr4GBx4hxQ46s7ITtZrAsxG22+rVg==
@@ -820,7 +831,7 @@
   dependencies:
     "@octokit/types" "^14.0.0"
 
-"@octokit/request-error@^5.0.0", "@octokit/request-error@^5.1.1":
+"@octokit/request-error@^5.1.1":
   version "5.1.1"
   resolved "https://registry.yarnpkg.com/@octokit/request-error/-/request-error-5.1.1.tgz#b9218f9c1166e68bb4d0c89b638edc62c9334805"
   integrity sha512-v9iyEQJH6ZntoENr9/yXxjuezh4My67CBSu9r6Ve/05Iu5gNgnisNWOsoJHTP6k0Rr0+HQIpnH+kyammu90q/g==
@@ -829,7 +840,7 @@
     deprecation "^2.0.0"
     once "^1.4.0"
 
-"@octokit/request@^8.0.1", "@octokit/request@^8.0.2":
+"@octokit/request@^8.4.1":
   version "8.4.1"
   resolved "https://registry.yarnpkg.com/@octokit/request/-/request-8.4.1.tgz#715a015ccf993087977ea4365c44791fc4572486"
   integrity sha512-qnB2+SY3hkCmBxZsR/MPCybNmbJe4KAlfWErXq+rBKkQJlbjdJeS85VI9r8UqeLYLvnAenU8Q1okM/0MBsAGXw==
@@ -839,14 +850,14 @@
     "@octokit/types" "^13.1.0"
     universal-user-agent "^6.0.0"
 
-"@octokit/types@^12.0.0", "@octokit/types@^12.6.0":
+"@octokit/types@^12.6.0":
   version "12.6.0"
   resolved "https://registry.yarnpkg.com/@octokit/types/-/types-12.6.0.tgz#8100fb9eeedfe083aae66473bd97b15b62aedcb2"
   integrity sha512-1rhSOfRa6H9w4YwK0yrf5faDaDTb+yLyBUKOCV4xtCDB5VmIPqd/v9yr9o6SAzOAlRxMiRiCic6JVM1/kunVkw==
   dependencies:
     "@octokit/openapi-types" "^20.0.0"
 
-"@octokit/types@^13.1.0":
+"@octokit/types@^13.0.0", "@octokit/types@^13.1.0":
   version "13.10.0"
   resolved "https://registry.yarnpkg.com/@octokit/types/-/types-13.10.0.tgz#3e7c6b19c0236c270656e4ea666148c2b51fd1a3"
   integrity sha512-ifLaO34EbbPj0Xgro4G5lP5asESjwHracYJvVaPIyXMuiuXLlhic3S47cBdTb+jfODkTE5YtGCLt3Ay3+J97sA==
@@ -2570,10 +2581,10 @@ undici-types@~6.21.0:
   resolved "https://registry.yarnpkg.com/undici-types/-/undici-types-6.21.0.tgz#691d00af3909be93a7faa13be61b3a5b50ef12cb"
   integrity sha512-iwDZqg0QAGrg9Rav5H4n0M64c3mkR59cJ6wQp+7C4nI0gsmExaedaYLNO44eT4AtBBwjbTiGPMlt2Md0T9H9JQ==
 
-undici@^5.25.4:
-  version "5.28.5"
-  resolved "https://registry.yarnpkg.com/undici/-/undici-5.28.5.tgz#b2b94b6bf8f1d919bc5a6f31f2c01deb02e54d4b"
-  integrity sha512-zICwjrDrcrUE0pyyJc1I2QzBkLM8FINsgOrt6WjA+BgajVq9Nxu2PbFFXUrAggLfDXlZGZBVZYw7WNV5KiBiBA==
+undici@^5.25.4, undici@^5.28.5:
+  version "5.29.0"
+  resolved "https://registry.yarnpkg.com/undici/-/undici-5.29.0.tgz#419595449ae3f2cdcba3580a2e8903399bd1f5a3"
+  integrity sha512-raqeBD6NQK4SkWhQzeYKd1KmIG6dllBOTt55Rmkt4HtI9mwdWtJljnrXjAFUBLTSN67HWrOIZ3EPF4kjUw80Bg==
   dependencies:
     "@fastify/busboy" "^2.0.0"
 

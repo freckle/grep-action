@@ -60,6 +60,30 @@ jobs:
                 A longer message body
 ```
 
+## Security Recommendations
+
+For enhanced security when using this action, consider implementing these best practices:
+
+### SHA Pinning
+
+Reference the action using a full commit SHA instead of a version tag to protect against supply chain attacks:
+
+```yaml
+- uses: freckle/grep-action@dd64f200665b77673185885bd2ef9e72bbd9ecd9  # v1.1.2
+```
+
+### Minimal Permissions
+
+Restrict the workflow permissions to only what is needed:
+
+```yaml
+permissions:
+  contents: read       # Only need to read repository contents
+  pull-requests: write # Needed to add annotations to PRs
+```
+
+These permissions ensure the action has only the necessary access to your repository while still being able to create annotations.
+
 ## Inputs
 
 - `patterns`: See below.

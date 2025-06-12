@@ -14,6 +14,7 @@ test("Loads minimal Patterns", () => {
 
   expect(results).toEqual([
     {
+      id: null,
       pattern: "abc",
       syntax: "basic",
       binaryFiles: "binary",
@@ -24,6 +25,7 @@ test("Loads minimal Patterns", () => {
       message: null,
     },
     {
+      id: null,
       pattern: "xyz",
       syntax: "basic",
       binaryFiles: "binary",
@@ -107,6 +109,7 @@ test("Respects level", () => {
 
 test("matchesAny", () => {
   const pattern = {
+    id: null,
     pattern: "",
     syntax: "basic" as GrepSyntax,
     binaryFiles: "binary" as GrepBinaryFiles,

@@ -82,6 +82,12 @@ async function run() {
           reporter.onResult(pattern, result);
         });
         core.endGroup();
+
+        if (pattern.id) {
+          core.setOutput(pattern.id, results.length > 0 ? "true" : "false");
+          core.setOutput(`${pattern.id}_count`, results.length.toString());
+          core.setOutput(`${pattern.id}_results`, JSON.stringify(results));
+        }
       }
     }
 

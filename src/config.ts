@@ -5,6 +5,7 @@ import type { AnnotationLevel } from "./github";
 import type { GrepSyntax, GrepBinaryFiles } from "./grep";
 
 export type Pattern = {
+  id: string | null;
   pattern: string;
   syntax: GrepSyntax;
   binaryFiles: GrepBinaryFiles;
@@ -16,11 +17,12 @@ export type Pattern = {
 };
 
 function fromPatternYaml(patternYaml: PatternYaml): Pattern {
-  const { pattern, syntax, paths, level, title, message } = patternYaml;
+  const { id, pattern, syntax, paths, level, title, message } = patternYaml;
   const pathsIgnore = patternYaml["paths-ignore"];
   const binaryFiles = patternYaml["binary-files"];
 
   return {
+    id: id === undefined ? null : id,
     pattern,
     syntax: syntax || "basic",
     binaryFiles: binaryFiles || "binary",
@@ -33,6 +35,7 @@ function fromPatternYaml(patternYaml: PatternYaml): Pattern {
 }
 
 type PatternYaml = {
+  id: string | null;
   pattern: string;
   syntax: GrepSyntax | null;
   "binary-files": GrepBinaryFiles | null;

@@ -45,10 +45,11 @@ exports.matchesAny = matchesAny;
 const yaml = __importStar(__nccwpck_require__(4281));
 const minimatch_1 = __nccwpck_require__(6507);
 function fromPatternYaml(patternYaml) {
-    const { pattern, syntax, paths, level, title, message } = patternYaml;
+    const { id, pattern, syntax, paths, level, title, message } = patternYaml;
     const pathsIgnore = patternYaml["paths-ignore"];
     const binaryFiles = patternYaml["binary-files"];
     return {
+        id: id === undefined ? null : id,
         pattern,
         syntax: syntax || "basic",
         binaryFiles: binaryFiles || "binary",
@@ -374,6 +375,11 @@ async function run() {
                     reporter.onResult(pattern, result);
                 });
                 core.endGroup();
+                if (pattern.id) {
+                    core.setOutput(pattern.id, results.length > 0 ? "true" : "false");
+                    core.setOutput(`${pattern.id}_count`, results.length.toString());
+                    core.setOutput(`${pattern.id}_results`, JSON.stringify(results));
+                }
             }
         }
         reporter.onFinish(client);
@@ -11050,216 +11056,6 @@ function removeHook(state, name, method) {
 
   state.registry[name].splice(index, 1);
 }
-
-
-/***/ }),
-
-/***/ 4691:
-/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
-
-var balanced = __nccwpck_require__(9380);
-
-module.exports = expandTop;
-
-var escSlash = '\0SLASH'+Math.random()+'\0';
-var escOpen = '\0OPEN'+Math.random()+'\0';
-var escClose = '\0CLOSE'+Math.random()+'\0';
-var escComma = '\0COMMA'+Math.random()+'\0';
-var escPeriod = '\0PERIOD'+Math.random()+'\0';
-
-function numeric(str) {
-  return parseInt(str, 10) == str
-    ? parseInt(str, 10)
-    : str.charCodeAt(0);
-}
-
-function escapeBraces(str) {
-  return str.split('\\\\').join(escSlash)
-            .split('\\{').join(escOpen)
-            .split('\\}').join(escClose)
-            .split('\\,').join(escComma)
-            .split('\\.').join(escPeriod);
-}
-
-function unescapeBraces(str) {
-  return str.split(escSlash).join('\\')
-            .split(escOpen).join('{')
-            .split(escClose).join('}')
-            .split(escComma).join(',')
-            .split(escPeriod).join('.');
-}
-
-
-// Basically just str.split(","), but handling cases
-// where we have nested braced sections, which should be
-// treated as individual members, like {a,{b,c},d}
-function parseCommaParts(str) {
-  if (!str)
-    return [''];
-
-  var parts = [];
-  var m = balanced('{', '}', str);
-
-  if (!m)
-    return str.split(',');
-
-  var pre = m.pre;
-  var body = m.body;
-  var post = m.post;
-  var p = pre.split(',');
-
-  p[p.length-1] += '{' + body + '}';
-  var postParts = parseCommaParts(post);
-  if (post.length) {
-    p[p.length-1] += postParts.shift();
-    p.push.apply(p, postParts);
-  }
-
-  parts.push.apply(parts, p);
-
-  return parts;
-}
-
-function expandTop(str) {
-  if (!str)
-    return [];
-
-  // I don't know why Bash 4.3 does this, but it does.
-  // Anything starting with {} will have the first two bytes preserved
-  // but *only* at the top level, so {},a}b will not expand to anything,
-  // but a{},b}c will be expanded to [a}c,abc].
-  // One could argue that this is a bug in Bash, but since the goal of
-  // this module is to match Bash's rules, we escape a leading {}
-  if (str.substr(0, 2) === '{}') {
-    str = '\\{\\}' + str.substr(2);
-  }
-
-  return expand(escapeBraces(str), true).map(unescapeBraces);
-}
-
-function embrace(str) {
-  return '{' + str + '}';
-}
-function isPadded(el) {
-  return /^-?0\d/.test(el);
-}
-
-function lte(i, y) {
-  return i <= y;
-}
-function gte(i, y) {
-  return i >= y;
-}
-
-function expand(str, isTop) {
-  var expansions = [];
-
-  var m = balanced('{', '}', str);
-  if (!m) return [str];
-
-  // no need to expand pre, since it is guaranteed to be free of brace-sets
-  var pre = m.pre;
-  var post = m.post.length
-    ? expand(m.post, false)
-    : [''];
-
-  if (/\$$/.test(m.pre)) {    
-    for (var k = 0; k < post.length; k++) {
-      var expansion = pre+ '{' + m.body + '}' + post[k];
-      expansions.push(expansion);
-    }
-  } else {
-    var isNumericSequence = /^-?\d+\.\.-?\d+(?:\.\.-?\d+)?$/.test(m.body);
-    var isAlphaSequence = /^[a-zA-Z]\.\.[a-zA-Z](?:\.\.-?\d+)?$/.test(m.body);
-    var isSequence = isNumericSequence || isAlphaSequence;
-    var isOptions = m.body.indexOf(',') >= 0;
-    if (!isSequence && !isOptions) {
-      // {a},b}
-      if (m.post.match(/,(?!,).*\}/)) {
-        str = m.pre + '{' + m.body + escClose + m.post;
-        return expand(str);
-      }
-      return [str];
-    }
-
-    var n;
-    if (isSequence) {
-      n = m.body.split(/\.\./);
-    } else {
-      n = parseCommaParts(m.body);
-      if (n.length === 1) {
-        // x{{a,b}}y ==> x{a}y x{b}y
-        n = expand(n[0], false).map(embrace);
-        if (n.length === 1) {
-          return post.map(function(p) {
-            return m.pre + n[0] + p;
-          });
-        }
-      }
-    }
-
-    // at this point, n is the parts, and we know it's not a comma set
-    // with a single entry.
-    var N;
-
-    if (isSequence) {
-      var x = numeric(n[0]);
-      var y = numeric(n[1]);
-      var width = Math.max(n[0].length, n[1].length)
-      var incr = n.length == 3
-        ? Math.abs(numeric(n[2]))
-        : 1;
-      var test = lte;
-      var reverse = y < x;
-      if (reverse) {
-        incr *= -1;
-        test = gte;
-      }
-      var pad = n.some(isPadded);
-
-      N = [];
-
-      for (var i = x; test(i, y); i += incr) {
-        var c;
-        if (isAlphaSequence) {
-          c = String.fromCharCode(i);
-          if (c === '\\')
-            c = '';
-        } else {
-          c = String(i);
-          if (pad) {
-            var need = width - c.length;
-            if (need > 0) {
-              var z = new Array(need + 1).join('0');
-              if (i < 0)
-                c = '-' + z + c.slice(1);
-              else
-                c = z + c;
-            }
-          }
-        }
-        N.push(c);
-      }
-    } else {
-      N = [];
-
-      for (var j = 0; j < n.length; j++) {
-        N.push.apply(N, expand(n[j], false));
-      }
-    }
-
-    for (var j = 0; j < N.length; j++) {
-      for (var k = 0; k < post.length; k++) {
-        var expansion = pre + N[j] + post[k];
-        if (!isTop || isSequence || expansion)
-          expansions.push(expansion);
-      }
-    }
-  }
-
-  return expansions;
-}
-
 
 
 /***/ }),
@@ -40674,7 +40470,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.unescape = exports.escape = exports.AST = exports.Minimatch = exports.match = exports.makeRe = exports.braceExpand = exports.defaults = exports.filter = exports.GLOBSTAR = exports.sep = exports.minimatch = void 0;
-const brace_expansion_1 = __importDefault(__nccwpck_require__(4691));
+const brace_expansion_1 = __importDefault(__nccwpck_require__(2055));
 const assert_valid_pattern_js_1 = __nccwpck_require__(7305);
 const ast_js_1 = __nccwpck_require__(1803);
 const escape_js_1 = __nccwpck_require__(800);
@@ -41717,6 +41513,335 @@ const unescape = (s, { windowsPathsNoEscape = false, } = {}) => {
 exports.unescape = unescape;
 //# sourceMappingURL=unescape.js.map
 
+/***/ }),
+
+/***/ 2055:
+/***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __nccwpck_require__) => {
+
+"use strict";
+// ESM COMPAT FLAG
+__nccwpck_require__.r(__webpack_exports__);
+
+// EXPORTS
+__nccwpck_require__.d(__webpack_exports__, {
+  "default": () => (/* binding */ expandTop)
+});
+
+;// CONCATENATED MODULE: ./node_modules/minimatch/node_modules/balanced-match/index.js
+/**
+ * @param {string | RegExp} a
+ * @param {string | RegExp} b
+ * @param {string} str
+ */
+function balanced (a, b, str) {
+  if (a instanceof RegExp) a = maybeMatch(a, str)
+  if (b instanceof RegExp) b = maybeMatch(b, str)
+
+  const r = range(a, b, str)
+
+  return (
+    r && {
+      start: r[0],
+      end: r[1],
+      pre: str.slice(0, r[0]),
+      body: str.slice(r[0] + a.length, r[1]),
+      post: str.slice(r[1] + b.length)
+    }
+  )
+}
+
+/**
+ * @param {RegExp} reg
+ * @param {string} str
+ */
+function maybeMatch (reg, str) {
+  const m = str.match(reg)
+  return m ? m[0] : null
+}
+
+/**
+ * @param {string} a
+ * @param {string} b
+ * @param {string} str
+ */
+function range (a, b, str) {
+  let begs, beg, left, right, result
+  let ai = str.indexOf(a)
+  let bi = str.indexOf(b, ai + 1)
+  let i = ai
+
+  if (ai >= 0 && bi > 0) {
+    if (a === b) {
+      return [ai, bi]
+    }
+    begs = []
+    left = str.length
+
+    while (i >= 0 && !result) {
+      if (i === ai) {
+        begs.push(i)
+        ai = str.indexOf(a, i + 1)
+      } else if (begs.length === 1) {
+        result = [begs.pop(), bi]
+      } else {
+        beg = begs.pop()
+        if (beg < left) {
+          left = beg
+          right = bi
+        }
+
+        bi = str.indexOf(b, i + 1)
+      }
+
+      i = ai < bi && ai >= 0 ? ai : bi
+    }
+
+    if (begs.length) {
+      result = [left, right]
+    }
+  }
+
+  return result
+}
+
+;// CONCATENATED MODULE: ./node_modules/minimatch/node_modules/brace-expansion/index.js
+
+
+const escSlash = '\0SLASH' + Math.random() + '\0'
+const escOpen = '\0OPEN' + Math.random() + '\0'
+const escClose = '\0CLOSE' + Math.random() + '\0'
+const escComma = '\0COMMA' + Math.random() + '\0'
+const escPeriod = '\0PERIOD' + Math.random() + '\0'
+const escSlashPattern = new RegExp(escSlash, 'g')
+const escOpenPattern = new RegExp(escOpen, 'g')
+const escClosePattern = new RegExp(escClose, 'g')
+const escCommaPattern = new RegExp(escComma, 'g')
+const escPeriodPattern = new RegExp(escPeriod, 'g')
+const slashPattern = /\\\\/g
+const openPattern = /\\{/g
+const closePattern = /\\}/g
+const commaPattern = /\\,/g
+const periodPattern = /\\./g
+
+/**
+ * @return {number}
+ */
+function numeric (str) {
+  return !isNaN(str)
+    ? parseInt(str, 10)
+    : str.charCodeAt(0)
+}
+
+/**
+ * @param {string} str
+ */
+function escapeBraces (str) {
+  return str.replace(slashPattern, escSlash)
+    .replace(openPattern, escOpen)
+    .replace(closePattern, escClose)
+    .replace(commaPattern, escComma)
+    .replace(periodPattern, escPeriod)
+}
+
+/**
+ * @param {string} str
+ */
+function unescapeBraces (str) {
+  return str.replace(escSlashPattern, '\\')
+    .replace(escOpenPattern, '{')
+    .replace(escClosePattern, '}')
+    .replace(escCommaPattern, ',')
+    .replace(escPeriodPattern, '.')
+}
+
+/**
+ * Basically just str.split(","), but handling cases
+ * where we have nested braced sections, which should be
+ * treated as individual members, like {a,{b,c},d}
+ * @param {string} str
+ */
+function parseCommaParts (str) {
+  if (!str) { return [''] }
+
+  const parts = []
+  const m = balanced('{', '}', str)
+
+  if (!m) { return str.split(',') }
+
+  const { pre, body, post } = m
+  const p = pre.split(',')
+
+  p[p.length - 1] += '{' + body + '}'
+  const postParts = parseCommaParts(post)
+  if (post.length) {
+    p[p.length - 1] += postParts.shift()
+    p.push.apply(p, postParts)
+  }
+
+  parts.push.apply(parts, p)
+
+  return parts
+}
+
+/**
+ * @param {string} str
+ */
+function expandTop (str) {
+  if (!str) { return [] }
+
+  // I don't know why Bash 4.3 does this, but it does.
+  // Anything starting with {} will have the first two bytes preserved
+  // but *only* at the top level, so {},a}b will not expand to anything,
+  // but a{},b}c will be expanded to [a}c,abc].
+  // One could argue that this is a bug in Bash, but since the goal of
+  // this module is to match Bash's rules, we escape a leading {}
+  if (str.slice(0, 2) === '{}') {
+    str = '\\{\\}' + str.slice(2)
+  }
+
+  return expand(escapeBraces(str), true).map(unescapeBraces)
+}
+
+/**
+ * @param {string} str
+ */
+function embrace (str) {
+  return '{' + str + '}'
+}
+
+/**
+ * @param {string} el
+ */
+function isPadded (el) {
+  return /^-?0\d/.test(el)
+}
+
+/**
+ * @param {number} i
+ * @param {number} y
+ */
+function lte (i, y) {
+  return i <= y
+}
+
+/**
+ * @param {number} i
+ * @param {number} y
+ */
+function gte (i, y) {
+  return i >= y
+}
+
+/**
+ * @param {string} str
+ * @param {boolean} [isTop]
+ */
+function expand (str, isTop) {
+  /** @type {string[]} */
+  const expansions = []
+
+  const m = balanced('{', '}', str)
+  if (!m) return [str]
+
+  // no need to expand pre, since it is guaranteed to be free of brace-sets
+  const pre = m.pre
+  const post = m.post.length
+    ? expand(m.post, false)
+    : ['']
+
+  if (/\$$/.test(m.pre)) {
+    for (let k = 0; k < post.length; k++) {
+      const expansion = pre + '{' + m.body + '}' + post[k]
+      expansions.push(expansion)
+    }
+  } else {
+    const isNumericSequence = /^-?\d+\.\.-?\d+(?:\.\.-?\d+)?$/.test(m.body)
+    const isAlphaSequence = /^[a-zA-Z]\.\.[a-zA-Z](?:\.\.-?\d+)?$/.test(m.body)
+    const isSequence = isNumericSequence || isAlphaSequence
+    const isOptions = m.body.indexOf(',') >= 0
+    if (!isSequence && !isOptions) {
+      // {a},b}
+      if (m.post.match(/,(?!,).*\}/)) {
+        str = m.pre + '{' + m.body + escClose + m.post
+        return expand(str)
+      }
+      return [str]
+    }
+
+    let n
+    if (isSequence) {
+      n = m.body.split(/\.\./)
+    } else {
+      n = parseCommaParts(m.body)
+      if (n.length === 1) {
+        // x{{a,b}}y ==> x{a}y x{b}y
+        n = expand(n[0], false).map(embrace)
+        if (n.length === 1) {
+          return post.map(function (p) {
+            return m.pre + n[0] + p
+          })
+        }
+      }
+    }
+
+    // at this point, n is the parts, and we know it's not a comma set
+    // with a single entry.
+    let N
+
+    if (isSequence) {
+      const x = numeric(n[0])
+      const y = numeric(n[1])
+      const width = Math.max(n[0].length, n[1].length)
+      let incr = n.length === 3
+        ? Math.abs(numeric(n[2]))
+        : 1
+      let test = lte
+      const reverse = y < x
+      if (reverse) {
+        incr *= -1
+        test = gte
+      }
+      const pad = n.some(isPadded)
+
+      N = []
+
+      for (let i = x; test(i, y); i += incr) {
+        let c
+        if (isAlphaSequence) {
+          c = String.fromCharCode(i)
+          if (c === '\\') { c = '' }
+        } else {
+          c = String(i)
+          if (pad) {
+            const need = width - c.length
+            if (need > 0) {
+              const z = new Array(need + 1).join('0')
+              if (i < 0) { c = '-' + z + c.slice(1) } else { c = z + c }
+            }
+          }
+        }
+        N.push(c)
+      }
+    } else {
+      N = []
+
+      for (let j = 0; j < n.length; j++) {
+        N.push.apply(N, expand(n[j], false))
+      }
+    }
+
+    for (let j = 0; j < N.length; j++) {
+      for (let k = 0; k < post.length; k++) {
+        const expansion = pre + N[j] + post[k]
+        if (!isTop || isSequence || expansion) { expansions.push(expansion) }
+      }
+    }
+  }
+
+  return expansions
+}
+
+
 /***/ })
 
 /******/ 	});
@@ -41752,6 +41877,34 @@ exports.unescape = unescape;
 /******/ 	}
 /******/ 	
 /************************************************************************/
+/******/ 	/* webpack/runtime/define property getters */
+/******/ 	(() => {
+/******/ 		// define getter functions for harmony exports
+/******/ 		__nccwpck_require__.d = (exports, definition) => {
+/******/ 			for(var key in definition) {
+/******/ 				if(__nccwpck_require__.o(definition, key) && !__nccwpck_require__.o(exports, key)) {
+/******/ 					Object.defineProperty(exports, key, { enumerable: true, get: definition[key] });
+/******/ 				}
+/******/ 			}
+/******/ 		};
+/******/ 	})();
+/******/ 	
+/******/ 	/* webpack/runtime/hasOwnProperty shorthand */
+/******/ 	(() => {
+/******/ 		__nccwpck_require__.o = (obj, prop) => (Object.prototype.hasOwnProperty.call(obj, prop))
+/******/ 	})();
+/******/ 	
+/******/ 	/* webpack/runtime/make namespace object */
+/******/ 	(() => {
+/******/ 		// define __esModule on exports
+/******/ 		__nccwpck_require__.r = (exports) => {
+/******/ 			if(typeof Symbol !== 'undefined' && Symbol.toStringTag) {
+/******/ 				Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+/******/ 			}
+/******/ 			Object.defineProperty(exports, '__esModule', { value: true });
+/******/ 		};
+/******/ 	})();
+/******/ 	
 /******/ 	/* webpack/runtime/compat */
 /******/ 	
 /******/ 	if (typeof __nccwpck_require__ !== 'undefined') __nccwpck_require__.ab = __dirname + "/";

@@ -13,7 +13,7 @@ import { grep } from "./grep";
 async function getFiles(
   onlyChanged: boolean,
   changedFiles: string[],
-  pattern: Pattern
+  pattern: Pattern,
 ): Promise<string[]> {
   if (onlyChanged) {
     return changedFiles.filter((file) => {
@@ -36,7 +36,7 @@ async function run() {
 
     const token = core.getInput("github-token", { required: true });
     const patterns = config.loadPatterns(
-      core.getInput("patterns", { required: true })
+      core.getInput("patterns", { required: true }),
     );
     const onlyChanged = core.getBooleanInput("only-changed", {
       required: true,
@@ -49,7 +49,7 @@ async function run() {
     }) as AnnotationLevel;
 
     core.info(
-      `patterns: [${patterns.map((p) => p.pattern.toString()).join(", ")}]`
+      `patterns: [${patterns.map((p) => p.pattern.toString()).join(", ")}]`,
     );
     core.info(`only-changed: ${onlyChanged}`);
     core.endGroup();

@@ -86,6 +86,11 @@ See [`./action.yml`](./action.yml) for complete details.
 The `patterns` input is a String (as all inputs must be) that contains a Yaml
 Array of Objects with the following keys:
 
+- `id`
+
+  An optional identifier for the pattern. If provided, we will set outputs for
+  it (see below).
+
 - `pattern`
 
   A `grep` "Basic Regular Expression". See the "Basic vs Extended Regular
@@ -132,7 +137,15 @@ Array of Objects with the following keys:
 
 ## Outputs
 
-None.
+For any patterns with an `id` specified, the following outputs will be set:
+
+- `{id}`: the string `'true'` if any matches were found, or `'false'` if not.
+- `{id}_count`: the number of matches found.
+- `{id}_results`: a JSON-encoded list of objects with the following properties:
+
+  - `input`: the full line of `grep -n` output
+  - `path`: the matched path, parsed from above
+  - `line`: the line number of the match, parsed from above
 
 ## Example
 

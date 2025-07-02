@@ -28,7 +28,7 @@
     "@octokit/types": "^14.0.0",
     "@types/jest": "^30.0.0",
     "@types/js-yaml": "^4.0.5",
-    "@types/minimatch": "^5.1.2",
+    "@types/minimatch": "^6.0.0",
     "@types/node": "^22.13.14",
     "@vercel/ncc": "^0.38.3",
     "jest": "^30.0.0",

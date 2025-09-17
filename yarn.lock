@@ -752,6 +752,11 @@
   resolved "https://registry.yarnpkg.com/@octokit/openapi-types/-/openapi-types-25.1.0.tgz#5a72a9dfaaba72b5b7db375fd05e90ca90dc9682"
   integrity sha512-idsIggNXUKkk0+BExUn1dQ92sfysJrje03Q0bv0e+KPLrvyqZF8MnBpFz8UNfYDwB3Ie7Z0TByjWfzxt7vseaA==
 
+"@octokit/openapi-types@^26.0.0":
+  version "26.0.0"
+  resolved "https://registry.yarnpkg.com/@octokit/openapi-types/-/openapi-types-26.0.0.tgz#a528b560dbc4f02040dc08d19575498d57fff19d"
+  integrity sha512-7AtcfKtpo77j7Ts73b4OWhOZHTKo/gGY8bB3bNBQz4H+GRSWqx2yvj8TXRsbdTE0eRmYmXOEY66jM7mJ7LzfsA==
+
 "@octokit/plugin-paginate-rest@^9.2.2":
   version "9.2.2"
   resolved "https://registry.yarnpkg.com/@octokit/plugin-paginate-rest/-/plugin-paginate-rest-9.2.2.tgz#c516bc498736bcdaa9095b9a1d10d9d0501ae831"
@@ -767,11 +772,11 @@
     "@octokit/types" "^12.6.0"
 
 "@octokit/plugin-rest-endpoint-methods@^16.0.0":
-  version "16.0.0"
-  resolved "https://registry.yarnpkg.com/@octokit/plugin-rest-endpoint-methods/-/plugin-rest-endpoint-methods-16.0.0.tgz#ba30ca387fc2ac8bd93cf9f951174736babebd97"
-  integrity sha512-kJVUQk6/dx/gRNLWUnAWKFs1kVPn5O5CYZyssyEoNYaFedqZxsfYs7DwI3d67hGz4qOwaJ1dpm07hOAD1BXx6g==
+  version "16.1.0"
+  resolved "https://registry.yarnpkg.com/@octokit/plugin-rest-endpoint-methods/-/plugin-rest-endpoint-methods-16.1.0.tgz#eb17ce9e37327dcf7b15f4b31244d7f0b58491d1"
+  integrity sha512-nCsyiKoGRnhH5LkH8hJEZb9swpqOcsW+VXv1QoyUNQXJeVODG4+xM6UICEqyqe9XFr6LkL8BIiFCPev8zMDXPw==
   dependencies:
-    "@octokit/types" "^14.1.0"
+    "@octokit/types" "^15.0.0"
 
 "@octokit/request-error@^5.1.1":
   version "5.1.1"
@@ -806,12 +811,19 @@
   dependencies:
     "@octokit/openapi-types" "^24.2.0"
 
-"@octokit/types@^14.0.0", "@octokit/types@^14.1.0":
+"@octokit/types@^14.0.0":
   version "14.1.0"
   resolved "https://registry.yarnpkg.com/@octokit/types/-/types-14.1.0.tgz#3bf9b3a3e3b5270964a57cc9d98592ed44f840f2"
   integrity sha512-1y6DgTy8Jomcpu33N+p5w58l6xyt55Ar2I91RPiIA0xCJBXyUAhXCcmZaDWSANiha7R9a6qJJ2CRomGPZ6f46g==
   dependencies:
     "@octokit/openapi-types" "^25.1.0"
+
+"@octokit/types@^15.0.0":
+  version "15.0.0"
+  resolved "https://registry.yarnpkg.com/@octokit/types/-/types-15.0.0.tgz#6afe9b012115284ded9bf779e90d04081e0eadd3"
+  integrity sha512-8o6yDfmoGJUIeR9OfYU0/TUJTnMPG2r68+1yEdUeG2Fdqpj8Qetg0ziKIgcBm0RW/j29H41WP37CYCEhp6GoHQ==
+  dependencies:
+    "@octokit/openapi-types" "^26.0.0"
 
 "@pkgjs/parseargs@^0.11.0":
   version "0.11.0"

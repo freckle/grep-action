@@ -27,7 +27,7 @@
     "@octokit/plugin-rest-endpoint-methods": "^16.1.0",
     "@octokit/types": "^15.0.0",
     "@types/jest": "^30.0.0",
-    "@types/js-yaml": "^4.0.5",
+    "@types/js-yaml": "^4.0.9",
     "@types/minimatch": "^6.0.0",
     "@types/node": "^22.13.14",
     "@vercel/ncc": "^0.38.3",

@@ -813,6 +813,13 @@
   dependencies:
     "@octokit/openapi-types" "^26.0.0"
 
+"@octokit/types@^15.0.2":
+  version "15.0.2"
+  resolved "https://registry.yarnpkg.com/@octokit/types/-/types-15.0.2.tgz#fd0efd5af066590585abfa8f1b1167f3139578e6"
+  integrity sha512-rR+5VRjhYSer7sC51krfCctQhVTmjyUMAaShfPB8mscVa8tSoLyon3coxQmXu0ahJoLVWl8dSGD/3OGZlFV44Q==
+  dependencies:
+    "@octokit/openapi-types" "^26.0.0"
+
 "@pkgjs/parseargs@^0.11.0":
   version "0.11.0"
   resolved "https://registry.yarnpkg.com/@pkgjs/parseargs/-/parseargs-0.11.0.tgz#a77ea742fab25775145434eb1d2328cf5013ac33"

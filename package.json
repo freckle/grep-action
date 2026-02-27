@@ -23,7 +23,7 @@
     "minimatch": "^10.2.4"
   },
   "devDependencies": {
-    "@actions/glob": "^0.5.1",
+    "@actions/glob": "^0.6.1",
     "@octokit/plugin-rest-endpoint-methods": "^17.0.0",
     "@octokit/types": "^16.0.0",
     "@types/jest": "^30.0.0",

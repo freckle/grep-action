@@ -3,12 +3,12 @@ import { relative } from "path";
 import * as core from "@actions/core";
 import * as glob from "@actions/glob";
 
-import { Reporter } from "./reporter";
-import type { Pattern } from "./config";
-import * as config from "./config";
-import type { AnnotationLevel } from "./github";
-import * as github from "./github";
-import { grep } from "./grep";
+import { Reporter } from "./reporter.js"
+import type { Pattern } from "./config.js"
+import * as config from "./config.js"
+import type { AnnotationLevel } from "./github.js"
+import * as github from "./github.js"
+import { grep } from "./grep.js"
 
 async function getFiles(
   onlyChanged: boolean,

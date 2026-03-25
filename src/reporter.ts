@@ -1,10 +1,10 @@
 import * as core from "@actions/core";
 import * as gh from "@actions/github";
 
-import type { Annotation, AnnotationLevel, Conclusion } from "./github";
-import * as github from "./github";
-import type { GrepResult } from "./grep";
-import type { Pattern } from "./config";
+import type { Annotation, AnnotationLevel, Conclusion } from "./github.js"
+import * as github from "./github.js"
+import type { GrepResult } from "./grep.js"
+import type { Pattern } from "./config.js"
 
 type ClientType = ReturnType<typeof gh.getOctokit>;
 

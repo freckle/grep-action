@@ -1,7 +1,7 @@
 import * as fs from "fs";
 
-import type { GrepSyntax } from "./grep";
-import { grep, parseGrep } from "./grep";
+import type { GrepSyntax } from "./grep.js"
+import { grep, parseGrep } from "./grep.js"
 
 async function grepLines(
   syntax: GrepSyntax,

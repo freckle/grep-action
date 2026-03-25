@@ -1,8 +1,8 @@
 import * as yaml from "js-yaml";
 import { Minimatch } from "minimatch";
 
-import type { AnnotationLevel } from "./github";
-import type { GrepSyntax, GrepBinaryFiles } from "./grep";
+import type { AnnotationLevel } from "./github.js"
+import type { GrepSyntax, GrepBinaryFiles } from "./grep.js"
 
 export type Pattern = {
   id: string | null;

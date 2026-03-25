@@ -1,11 +1,23 @@
-/** @type {import('ts-jest/dist/types').InitialOptionsTsJest} */
-module.exports = {
-  preset: "ts-jest",
+import { createDefaultPreset } from "ts-jest";
+
+const presetConfig = createDefaultPreset();
+
+const jestConfig = {
+  ...presetConfig,
+  resetMocks: true,
   testEnvironment: "node",
-  transform: {
-    "^.+\\.[jt]sx?$": "ts-jest",
+  extensionsToTreatAsEsm: [".ts"],
+  moduleNameMapper: {
+    "^(\\.{1,2}/.*)\\.js$": "$1",
   },
-  transformIgnorePatterns: [
-    "/node_modules/(?!(minimatch|brace-expansion|balanced-match)/)",
-  ],
+  transform: {
+    "^.+\\.ts$": [
+      "ts-jest",
+      {
+        useESM: true,
+      },
+    ],
+  },
 };
+
+export default jestConfig;

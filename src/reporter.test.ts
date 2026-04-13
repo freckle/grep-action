@@ -1,4 +1,4 @@
-import { Reporter } from "./reporter";
+import { Reporter } from "./reporter.js"
 
 test("exceedsFailureThreshold", () => {
   const reporter = new Reporter(false, "warning");

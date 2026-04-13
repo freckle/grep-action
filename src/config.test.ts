@@ -1,6 +1,6 @@
-import * as config from "./config";
-import type { AnnotationLevel } from "./github";
-import type { GrepSyntax, GrepBinaryFiles } from "./grep";
+import * as config from "./config.js"
+import type { AnnotationLevel } from "./github.js"
+import type { GrepSyntax, GrepBinaryFiles } from "./grep.js"
 
 test("Loads minimal Patterns", () => {
   const example = [

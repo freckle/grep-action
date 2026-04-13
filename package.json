@@ -1,13 +1,14 @@
 {
   "name": "grep",
   "version": "0.0.0",
+  "type": "module",
   "description": "Run grep and submit results, with context, as Annotations",
   "main": "lib/main.js",
   "scripts": {
     "build": "tsc && ncc build lib/main.js && sed -i 's/\\x0D$//' ./dist/index.js",
     "format": "prettier --write \"**/*.ts\"",
     "format-check": "prettier --check \"**/*.ts\"",
-    "test": "jest"
+    "test": "NODE_OPTIONS='--experimental-vm-modules' jest"
   },
   "repository": {
     "type": "git",
@@ -16,24 +17,24 @@
   "author": "Freckle",
   "license": "MIT",
   "dependencies": {
-    "@actions/core": "^2.0.3",
-    "@actions/exec": "^2.0.0",
-    "@actions/github": "^7.0.0",
+    "@actions/core": "^3.0.0",
+    "@actions/exec": "^3.0.0",
+    "@actions/github": "^9.1.0",
     "js-yaml": "^4.1.1",
-    "minimatch": "^10.2.1"
+    "minimatch": "^10.2.5"
   },
   "devDependencies": {
-    "@actions/glob": "^0.5.1",
+    "@actions/glob": "^0.6.1",
     "@octokit/plugin-rest-endpoint-methods": "^17.0.0",
     "@octokit/types": "^16.0.0",
     "@types/jest": "^30.0.0",
     "@types/js-yaml": "^4.0.9",
     "@types/minimatch": "^6.0.0",
-    "@types/node": "^24.10.13",
+    "@types/node": "^24.12.2",
     "@vercel/ncc": "^0.38.4",
-    "jest": "^30.2.0",
-    "prettier": "^3.8.1",
-    "ts-jest": "^29.4.6",
+    "jest": "^30.3.0",
+    "prettier": "^3.8.2",
+    "ts-jest": "^29.4.9",
     "typescript": "^5.9.3"
   }
 }

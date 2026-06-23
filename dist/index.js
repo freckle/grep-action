@@ -40839,7 +40839,7 @@ class Reporter {
 }
 
 ;// CONCATENATED MODULE: ./node_modules/js-yaml/dist/js-yaml.mjs
-/*! js-yaml 5.0.0 https://github.com/nodeca/js-yaml @license MIT */
+/*! js-yaml 5.1.0 https://github.com/nodeca/js-yaml @license MIT */
 //#region src/tag.ts
 var NOT_RESOLVED = Symbol("NOT_RESOLVED");
 var MERGE_KEY = Symbol("MERGE_KEY");
@@ -40857,6 +40857,7 @@ function defineScalarTag(tagName, options) {
 	};
 }
 function defineSequenceTag(tagName, options) {
+	const carrierIsResult = options.finalize === void 0;
 	return {
 		tagName,
 		nodeKind: "sequence",
@@ -40864,12 +40865,15 @@ function defineSequenceTag(tagName, options) {
 		matchByTagPrefix: options.matchByTagPrefix ?? false,
 		create: options.create,
 		addItem: options.addItem,
+		finalize: options.finalize ?? ((carrier) => carrier),
+		carrierIsResult,
 		identify: options.identify ?? null,
 		represent: options.represent ?? ((data) => data),
 		representTagName: options.representTagName ?? null
 	};
 }
 function defineMappingTag(tagName, options) {
+	const carrierIsResult = options.finalize === void 0;
 	return {
 		tagName,
 		nodeKind: "mapping",
@@ -40880,6 +40884,8 @@ function defineMappingTag(tagName, options) {
 		has: options.has,
 		keys: options.keys,
 		get: options.get,
+		finalize: options.finalize ?? ((carrier) => carrier),
+		carrierIsResult,
 		identify: options.identify ?? null,
 		represent: options.represent ?? ((data) => data),
 		representTagName: options.representTagName ?? null
@@ -41983,6 +41989,14 @@ function eventPosition$1(event) {
 function throwError$1(state, message) {
 	throwErrorAt(state.source, state.position, message, state.filename);
 }
+function finalizeCollection(state, position, tag, carrier) {
+	try {
+		return tag.finalize(carrier);
+	} catch (error) {
+		if (error instanceof YAMLException) throw error;
+		throwErrorAt(state.source, position, error instanceof Error ? error.message : String(error), state.filename);
+	}
+}
 function lookupTag(exact, prefix, tagName) {
 	const exactTag = exact[tagName];
 	if (exactTag) return exactTag;
@@ -42015,8 +42029,9 @@ function constructScalar(state, event) {
 		const collectionTagDef = lookupTag(state.schema.exact.mapping, state.schema.prefix.mapping, tagName) ?? lookupTag(state.schema.exact.sequence, state.schema.prefix.sequence, tagName);
 		if (collectionTagDef) {
 			if (source !== "") throwError$1(state, `cannot resolve a node with !<${tagName}> explicit tag`);
+			const carrier = collectionTagDef.create(tagName);
 			return {
-				value: collectionTagDef.create(tagName),
+				value: collectionTagDef.carrierIsResult ? carrier : finalizeCollection(state, state.position, collectionTagDef, carrier),
 				tag: collectionTagDef
 			};
 		}
@@ -42102,11 +42117,17 @@ function addValue(state, value, tag) {
 		frame.hasKey = true;
 	}
 }
-function storeAnchor(state, event, value, tag) {
-	if (event.anchorStart !== NO_RANGE$2) state.anchors.set(state.source.slice(event.anchorStart, event.anchorEnd), {
-		value,
-		tag
-	});
+function storeAnchor(state, event, value, tag, isValueFinal) {
+	if (event.anchorStart !== NO_RANGE$2) {
+		const anchor = {
+			value,
+			tag,
+			isValueFinal
+		};
+		state.anchors.set(state.source.slice(event.anchorStart, event.anchorEnd), anchor);
+		return anchor;
+	}
+	return null;
 }
 function constructFromEvents(events, options) {
 	const state = {
@@ -42137,14 +42158,14 @@ function constructFromEvents(events, options) {
 				break;
 			case 4: {
 				const { value, tag } = constructScalar(state, event);
-				storeAnchor(state, event, value, tag);
+				storeAnchor(state, event, value, tag, true);
 				addValue(state, value, tag);
 				break;
 			}
 			case 2: {
 				const definition = collectionTag(state, event, state.schema.exact.sequence, state.schema.prefix.sequence, "tag:yaml.org,2002:seq", "sequence");
 				const value = definition.tag.create(definition.tagName);
-				storeAnchor(state, event, value, definition.tag);
+				const anchor = storeAnchor(state, event, value, definition.tag, definition.tag.carrierIsResult);
 				const parent = state.frames[state.frames.length - 1];
 				const merge = parent !== void 0 && parent.kind === "mapping" && parent.hasKey && parent.key === MERGE_KEY;
 				state.frames.push({
@@ -42152,6 +42173,7 @@ function constructFromEvents(events, options) {
 					position: state.position,
 					value,
 					tag: definition.tag,
+					anchor,
 					index: 0,
 					merge
 				});
@@ -42160,12 +42182,13 @@ function constructFromEvents(events, options) {
 			case 3: {
 				const definition = collectionTag(state, event, state.schema.exact.mapping, state.schema.prefix.mapping, "tag:yaml.org,2002:map", "mapping");
 				const value = definition.tag.create(definition.tagName);
-				storeAnchor(state, event, value, definition.tag);
+				const anchor = storeAnchor(state, event, value, definition.tag, definition.tag.carrierIsResult);
 				state.frames.push({
 					kind: "mapping",
 					position: state.position,
 					value,
 					tag: definition.tag,
+					anchor,
 					key: void 0,
 					keyPosition: state.position,
 					hasKey: false,
@@ -42177,13 +42200,21 @@ function constructFromEvents(events, options) {
 				const name = state.source.slice(event.anchorStart, event.anchorEnd);
 				const anchor = state.anchors.get(name);
 				if (!anchor) throwError$1(state, `unidentified alias "${name}"`);
+				if (!anchor.isValueFinal) throwError$1(state, `recursive alias "${name}" is not supported for tag ${anchor.tag.tagName} because it uses finalize()`);
 				addValue(state, anchor.value, anchor.tag);
 				break;
 			}
 			case 6: {
 				const frame = state.frames.pop();
 				if (frame.kind === "document") state.documents.push(frame.value);
-				else addValue(state, frame.value, frame.tag);
+				else {
+					const value = frame.tag.carrierIsResult ? frame.value : finalizeCollection(state, frame.position, frame.tag, frame.value);
+					if (frame.anchor) {
+						frame.anchor.value = value;
+						frame.anchor.isValueFinal = true;
+					}
+					addValue(state, value, frame.tag);
+				}
 				break;
 			}
 		}
@@ -43274,7 +43305,8 @@ var DEFAULT_PRESENTER_OPTIONS = {
 	flowSkipCommaSpace: false,
 	flowSkipColonSpace: false,
 	quoteFlowKeys: false,
-	quoteStyle: "auto",
+	quoteStyle: "single",
+	forceQuotes: false,
 	tagBeforeAnchor: false
 };
 function nodeTagShort(node) {
@@ -43388,9 +43420,8 @@ var STYLE_SINGLE = 2;
 var STYLE_LITERAL = 3;
 var STYLE_FOLDED = 4;
 var STYLE_DOUBLE = 5;
-function chooseScalarStyle(state, string, layout, singleLineOnly, inblock) {
+function chooseScalarStyle(state, string, layout, singleLineOnly, forceQuote, inblock) {
 	const { blockIndent, lineWidth } = layout;
-	const forceQuote = state.quoteStyle !== "auto";
 	let i;
 	let char = 0;
 	let prevChar = -1;
@@ -43447,11 +43478,11 @@ function resolveScalarStyle(state, node, layout, iskey, inblock) {
 	}
 	const string = node.value;
 	if (string.length === 0) {
-		if (state.quoteStyle === "auto" && (node.style.tagged || resolveImplicitTag(state, string) === node.tag)) return STYLE_PLAIN;
+		if (node.style.tagged || resolveImplicitTag(state, string) === node.tag) return STYLE_PLAIN;
 		return state.quoteStyle === "double" ? STYLE_DOUBLE : STYLE_SINGLE;
 	}
-	const style = chooseScalarStyle(state, string, layout, singleLineOnly, inblock);
-	if (style === STYLE_PLAIN && !node.style.tagged && resolveImplicitTag(state, string) !== node.tag) return STYLE_SINGLE;
+	const style = chooseScalarStyle(state, string, layout, singleLineOnly, state.forceQuotes && !iskey, inblock);
+	if (style === STYLE_PLAIN && !node.style.tagged && resolveImplicitTag(state, string) !== node.tag) return state.quoteStyle === "double" ? STYLE_DOUBLE : STYLE_SINGLE;
 	return style;
 }
 function blockHeader(string, indentPerLevel) {
@@ -43568,7 +43599,7 @@ function writeFlowMapping(state, level, node) {
 	for (const { key, value } of items) {
 		let pairBuffer = "";
 		if (result !== "") pairBuffer += `,${!state.flowSkipCommaSpace ? " " : ""}`;
-		const keyText = writeNode(state, level, key, {});
+		const keyText = writeNode(state, level, key, { iskey: true });
 		const explicitPair = keyText.length > 1024;
 		if (explicitPair) pairBuffer += "? ";
 		else if (state.quoteFlowKeys) pairBuffer += "\"";

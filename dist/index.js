@@ -40839,7 +40839,7 @@ class Reporter {
 }
 
 ;// CONCATENATED MODULE: ./node_modules/js-yaml/dist/js-yaml.mjs
-/*! js-yaml 5.1.0 https://github.com/nodeca/js-yaml @license MIT */
+/*! js-yaml 5.2.0 https://github.com/nodeca/js-yaml @license MIT */
 //#region src/tag.ts
 var NOT_RESOLVED = Symbol("NOT_RESOLVED");
 var MERGE_KEY = Symbol("MERGE_KEY");
@@ -41081,7 +41081,7 @@ var intCoreTag = defineScalarTag("tag:yaml.org,2002:int", {
 		..."0123456789"
 	],
 	resolve: resolveYamlInteger$2,
-	identify: (object) => Object.prototype.toString.call(object) === "[object Number]" && object % 1 === 0 && !Object.is(object, -0),
+	identify: (object) => Number.isInteger(object) && !Object.is(object, -0) && object.toString(10).indexOf("e") < 0,
 	represent: (object) => object.toString(10)
 });
 //#endregion
@@ -41111,7 +41111,7 @@ var intJsonTag = defineScalarTag("tag:yaml.org,2002:int", {
 	implicit: true,
 	implicitFirstChars: ["-", ..."0123456789"],
 	resolve: resolveYamlInteger$1,
-	identify: (object) => Object.prototype.toString.call(object) === "[object Number]" && object % 1 === 0 && !Object.is(object, -0),
+	identify: (object) => Number.isInteger(object) && !Object.is(object, -0) && object.toString(10).indexOf("e") < 0,
 	represent: (object) => object.toString(10)
 });
 //#endregion
@@ -41147,7 +41147,7 @@ var intYaml11Tag = defineScalarTag("tag:yaml.org,2002:int", {
 		..."0123456789"
 	],
 	resolve: resolveYamlInteger,
-	identify: (object) => Object.prototype.toString.call(object) === "[object Number]" && object % 1 === 0 && !Object.is(object, -0),
+	identify: (object) => Number.isInteger(object) && !Object.is(object, -0) && object.toString(10).indexOf("e") < 0,
 	represent: (object) => object.toString(10)
 });
 //#endregion
@@ -41182,7 +41182,7 @@ var floatCoreTag = defineScalarTag("tag:yaml.org,2002:float", {
 		..."0123456789"
 	],
 	resolve: resolveYamlFloat$2,
-	identify: (object) => Object.prototype.toString.call(object) === "[object Number]" && (object % 1 !== 0 || Object.is(object, -0)),
+	identify: (object) => typeof object === "number" && (!Number.isInteger(object) || Object.is(object, -0) || object.toString(10).indexOf("e") >= 0),
 	represent: representYamlFloat$2
 });
 //#endregion
@@ -41217,7 +41217,7 @@ var floatJsonTag = defineScalarTag("tag:yaml.org,2002:float", {
 	implicit: true,
 	implicitFirstChars: ["-", ..."0123456789"],
 	resolve: resolveYamlFloat$1,
-	identify: (object) => Object.prototype.toString.call(object) === "[object Number]" && (object % 1 !== 0 || Object.is(object, -0)),
+	identify: (object) => typeof object === "number" && (!Number.isInteger(object) || Object.is(object, -0) || object.toString(10).indexOf("e") >= 0),
 	represent: representYamlFloat$1
 });
 //#endregion
@@ -41256,7 +41256,7 @@ var floatYaml11Tag = defineScalarTag("tag:yaml.org,2002:float", {
 		..."0123456789"
 	],
 	resolve: resolveYamlFloat,
-	identify: (object) => Object.prototype.toString.call(object) === "[object Number]" && (object % 1 !== 0 || Object.is(object, -0)),
+	identify: (object) => typeof object === "number" && (!Number.isInteger(object) || Object.is(object, -0) || object.toString(10).indexOf("e") >= 0),
 	represent: representYamlFloat
 });
 //#endregion
@@ -41977,7 +41977,8 @@ var DEFAULT_CONSTRUCTOR_OPTIONS = {
 	filename: "",
 	schema: CORE_SCHEMA,
 	json: false,
-	maxMergeSeqLength: 20
+	maxTotalMergeKeys: 1e4,
+	maxAliases: -1
 };
 function eventPosition$1(event) {
 	if ("tagStart" in event && event.tagStart !== NO_RANGE$2) return event.tagStart;
@@ -42065,6 +42066,7 @@ function isMappingTag(tag) {
 }
 function mergeKeys(state, frame, source, sourceTag) {
 	for (const sourceKey of sourceTag.keys(source)) {
+		if (state.maxTotalMergeKeys !== -1 && ++state.totalMergeKeys > state.maxTotalMergeKeys) throwError$1(state, `merge keys exceeded maxTotalMergeKeys (${state.maxTotalMergeKeys})`);
 		if (frame.tag.has(frame.value, sourceKey)) continue;
 		const err = frame.tag.addPair(frame.value, sourceKey, sourceTag.get(source, sourceKey));
 		if (err) throwError$1(state, err);
@@ -42074,14 +42076,8 @@ function mergeKeys(state, frame, source, sourceTag) {
 function mergeSource(state, frame, source, sourceTag) {
 	state.position = frame.keyPosition;
 	if (isMappingTag(sourceTag)) mergeKeys(state, frame, source, sourceTag);
-	else if (sourceTag.nodeKind === "sequence" && Array.isArray(source)) {
-		const seen = /* @__PURE__ */ new Set();
-		for (const element of source) {
-			if (seen.has(element)) continue;
-			seen.add(element);
-			mergeKeys(state, frame, element, frame.tag);
-		}
-	} else throwError$1(state, "cannot merge mappings; the provided source object is unacceptable");
+	else if (sourceTag.nodeKind === "sequence" && Array.isArray(source)) for (const element of source) mergeKeys(state, frame, element, frame.tag);
+	else throwError$1(state, "cannot merge mappings; the provided source object is unacceptable");
 }
 function addMappingValue(state, frame, key, value, tag) {
 	state.position = frame.keyPosition;
@@ -42102,7 +42098,6 @@ function addValue(state, value, tag) {
 	} else if (frame.kind === "sequence") {
 		if (frame.merge) {
 			if (!isMappingTag(tag)) throwError$1(state, "cannot merge mappings; the provided source object is unacceptable");
-			if (frame.index >= state.maxMergeSeqLength) throwError$1(state, `merge sequence length exceeded maxMergeSeqLength (${state.maxMergeSeqLength})`);
 		}
 		const err = frame.tag.addItem(frame.value, value, frame.index++);
 		if (err) throwError$1(state, err);
@@ -42139,7 +42134,9 @@ function constructFromEvents(events, options) {
 		position: 0,
 		frames: [],
 		anchors: /* @__PURE__ */ new Map(),
-		tagHandlers: Object.create(null)
+		tagHandlers: Object.create(null),
+		totalMergeKeys: 0,
+		aliasCount: 0
 	};
 	while (state.eventIndex < state.events.length) {
 		const event = state.events[state.eventIndex++];
@@ -42147,6 +42144,7 @@ function constructFromEvents(events, options) {
 		switch (event.type) {
 			case 1:
 				state.anchors = /* @__PURE__ */ new Map();
+				state.aliasCount = 0;
 				state.tagHandlers = Object.create(null);
 				for (const directive of event.directives) if (directive.kind === "tag") state.tagHandlers[directive.handle] = directive.prefix;
 				state.frames.push({
@@ -42197,6 +42195,7 @@ function constructFromEvents(events, options) {
 				break;
 			}
 			case 5: {
+				if (state.maxAliases !== -1 && ++state.aliasCount > state.maxAliases) throwError$1(state, `aliases exceeded maxAliases (${state.maxAliases})`);
 				const name = state.source.slice(event.anchorStart, event.anchorEnd);
 				const anchor = state.anchors.get(name);
 				if (!anchor) throwError$1(state, `unidentified alias "${name}"`);

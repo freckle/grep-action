@@ -25,8 +25,8 @@
   },
   "devDependencies": {
     "@actions/glob": "^0.7.0",
-    "@octokit/plugin-rest-endpoint-methods": "^17.0.0",
-    "@octokit/types": "^16.0.0",
+    "@octokit/plugin-rest-endpoint-methods": "^18.0.0",
+    "@octokit/types": "^17.0.0",
     "@types/jest": "^30.0.0",
     "@types/js-yaml": "^4.0.9",
     "@types/minimatch": "^6.0.0",

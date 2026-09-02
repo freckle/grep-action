@@ -1,127 +1,112 @@
-import * as config from "./config.js"
-import type { AnnotationLevel } from "./github.js"
-import type { GrepSyntax, GrepBinaryFiles } from "./grep.js"
+import * as config from './config.js'
+import type {AnnotationLevel} from './github.js'
+import type {GrepSyntax, GrepBinaryFiles} from './grep.js'
 
-test("Loads minimal Patterns", () => {
+test('Loads minimal Patterns', () => {
   const example = [
-    "- pattern: abc",
-    "  title: Found abc",
-    "- pattern: xyz",
-    "  title: Found xyz",
-  ].join("\n");
+    '- pattern: abc',
+    '  title: Found abc',
+    '- pattern: xyz',
+    '  title: Found xyz'
+  ].join('\n')
 
-  const results = config.loadPatterns(example);
+  const results = config.loadPatterns(example)
 
   expect(results).toEqual([
     {
       id: null,
-      pattern: "abc",
-      syntax: "basic",
-      binaryFiles: "binary",
-      paths: ["**/*"],
+      pattern: 'abc',
+      syntax: 'basic',
+      binaryFiles: 'binary',
+      paths: ['**/*'],
       pathsIgnore: [],
-      level: "notice",
-      title: "Found abc",
-      message: null,
+      level: 'notice',
+      title: 'Found abc',
+      message: null
     },
     {
       id: null,
-      pattern: "xyz",
-      syntax: "basic",
-      binaryFiles: "binary",
-      paths: ["**/*"],
+      pattern: 'xyz',
+      syntax: 'basic',
+      binaryFiles: 'binary',
+      paths: ['**/*'],
       pathsIgnore: [],
-      level: "notice",
-      title: "Found xyz",
-      message: null,
-    },
-  ]);
-});
+      level: 'notice',
+      title: 'Found xyz',
+      message: null
+    }
+  ])
+})
 
-test("Respects paths", () => {
+test('Respects paths', () => {
+  const example = ['- pattern: abc', '  paths:', "    - '**/*.js'", '  title: Found abc'].join('\n')
+
+  const results = config.loadPatterns(example)
+
+  expect(results.length).toBe(1)
+  expect(results[0].paths).toEqual(['**/*.js'])
+})
+
+test('Respects syntax', () => {
+  const example = ['- pattern: abc', '  syntax: perl', '  title: Found abc'].join('\n')
+
+  const results = config.loadPatterns(example)
+
+  expect(results.length).toBe(1)
+  expect(results[0].syntax).toEqual('perl')
+})
+
+test('Respects binary-files', () => {
+  const example = ['- pattern: abc', '  binary-files: without-match', '  title: Found abc'].join(
+    '\n'
+  )
+
+  const results = config.loadPatterns(example)
+
+  expect(results.length).toBe(1)
+  expect(results[0].binaryFiles).toEqual('without-match')
+})
+
+test('Respects paths-ignore', () => {
   const example = [
-    "- pattern: abc",
-    "  paths:",
+    '- pattern: abc',
+    '  paths:',
     "    - '**/*.js'",
-    "  title: Found abc",
-  ].join("\n");
-
-  const results = config.loadPatterns(example);
-
-  expect(results.length).toBe(1);
-  expect(results[0].paths).toEqual(["**/*.js"]);
-});
-
-test("Respects syntax", () => {
-  const example = [
-    "- pattern: abc",
-    "  syntax: perl",
-    "  title: Found abc",
-  ].join("\n");
-
-  const results = config.loadPatterns(example);
-
-  expect(results.length).toBe(1);
-  expect(results[0].syntax).toEqual("perl");
-});
-
-test("Respects binary-files", () => {
-  const example = [
-    "- pattern: abc",
-    "  binary-files: without-match",
-    "  title: Found abc",
-  ].join("\n");
-
-  const results = config.loadPatterns(example);
-
-  expect(results.length).toBe(1);
-  expect(results[0].binaryFiles).toEqual("without-match");
-});
-
-test("Respects paths-ignore", () => {
-  const example = [
-    "- pattern: abc",
-    "  paths:",
-    "    - '**/*.js'",
-    "  paths-ignore:",
+    '  paths-ignore:',
     "    - '**/*.test.js'",
-    "  title: Found abc",
-  ].join("\n");
+    '  title: Found abc'
+  ].join('\n')
 
-  const results = config.loadPatterns(example);
+  const results = config.loadPatterns(example)
 
-  expect(results.length).toBe(1);
-  expect(results[0].pathsIgnore).toEqual(["**/*.test.js"]);
-});
+  expect(results.length).toBe(1)
+  expect(results[0].pathsIgnore).toEqual(['**/*.test.js'])
+})
 
-test("Respects level", () => {
-  const example = [
-    "- pattern: abc",
-    "  level: warning",
-    "  title: Found abc",
-  ].join("\n");
+test('Respects level', () => {
+  const example = ['- pattern: abc', '  level: warning', '  title: Found abc'].join('\n')
 
-  const results = config.loadPatterns(example);
+  const results = config.loadPatterns(example)
 
-  expect(results.length).toBe(1);
-  expect(results[0].level).toEqual("warning");
-});
+  expect(results.length).toBe(1)
+  expect(results[0].level).toEqual('warning')
+})
 
-test("matchesAny", () => {
+test('matchesAny', () => {
   const pattern = {
     id: null,
-    pattern: "",
-    syntax: "basic" as GrepSyntax,
-    binaryFiles: "binary" as GrepBinaryFiles,
-    paths: ["**/*.js", "**/README.md"],
-    pathsIgnore: ["**/*.test.js", "test/**/*"],
-    level: "notice" as AnnotationLevel,
-    title: "xyz",
-    message: null,
-  };
+    pattern: '',
+    syntax: 'basic' as GrepSyntax,
+    binaryFiles: 'binary' as GrepBinaryFiles,
+    paths: ['**/*.js', '**/README.md'],
+    pathsIgnore: ['**/*.test.js', 'test/**/*'],
+    level: 'notice' as AnnotationLevel,
+    title: 'xyz',
+    message: null
+  }
 
-  expect(config.matchesAny(pattern, "src/config.js")).toBe(true);
-  expect(config.matchesAny(pattern, "src/config.test.js")).toBe(false);
-  expect(config.matchesAny(pattern, "doc/README.md")).toBe(true);
-  expect(config.matchesAny(pattern, "test/README.md")).toBe(false);
-});
+  expect(config.matchesAny(pattern, 'src/config.js')).toBe(true)
+  expect(config.matchesAny(pattern, 'src/config.test.js')).toBe(false)
+  expect(config.matchesAny(pattern, 'doc/README.md')).toBe(true)
+  expect(config.matchesAny(pattern, 'test/README.md')).toBe(false)
+})

@@ -1,39 +1,39 @@
-import * as core from "@actions/core";
-import * as gh from "@actions/github";
+import * as core from '@actions/core'
+import * as gh from '@actions/github'
 
-import type { Annotation, AnnotationLevel, Conclusion } from "./github.js"
-import * as github from "./github.js"
-import type { GrepResult } from "./grep.js"
-import type { Pattern } from "./config.js"
+import type {Annotation, AnnotationLevel, Conclusion} from './github.js'
+import * as github from './github.js'
+import type {GrepResult} from './grep.js'
+import type {Pattern} from './config.js'
 
-type ClientType = ReturnType<typeof gh.getOctokit>;
+type ClientType = ReturnType<typeof gh.getOctokit>
 
 export class Reporter {
-  createNewCheck: boolean;
-  failureThreshold: AnnotationLevel;
-  annotations: Annotation[];
-  conclusion: Conclusion;
+  createNewCheck: boolean
+  failureThreshold: AnnotationLevel
+  annotations: Annotation[]
+  conclusion: Conclusion
 
   constructor(createNewCheck: boolean, failureThreshold: AnnotationLevel) {
-    this.createNewCheck = createNewCheck;
-    this.failureThreshold = failureThreshold;
-    this.annotations = [];
-    this.conclusion = "success";
+    this.createNewCheck = createNewCheck
+    this.failureThreshold = failureThreshold
+    this.annotations = []
+    this.conclusion = 'success'
   }
 
   exceedsFailureThreshold(level: AnnotationLevel): boolean {
     const numericLevel = (l: AnnotationLevel): number => {
       switch (l) {
-        case "notice":
-          return 1;
-        case "warning":
-          return 2;
-        case "failure":
-          return 3;
+        case 'notice':
+          return 1
+        case 'warning':
+          return 2
+        case 'failure':
+          return 3
       }
-    };
+    }
 
-    return numericLevel(level) >= numericLevel(this.failureThreshold);
+    return numericLevel(level) >= numericLevel(this.failureThreshold)
   }
 
   onResult(pattern: Pattern, result: GrepResult): void {
@@ -42,16 +42,16 @@ export class Reporter {
       start_line: result.line,
       end_line: result.line,
       annotation_level: pattern.level,
-      message: pattern.message || "Flagged in freckle/grep-action",
-      title: pattern.title || "",
-      raw_details: result.input,
-    };
-
-    if (this.exceedsFailureThreshold(annotation.annotation_level)) {
-      this.conclusion = "failure";
+      message: pattern.message || 'Flagged in freckle/grep-action',
+      title: pattern.title || '',
+      raw_details: result.input
     }
 
-    this.annotations.push(annotation);
+    if (this.exceedsFailureThreshold(annotation.annotation_level)) {
+      this.conclusion = 'failure'
+    }
+
+    this.annotations.push(annotation)
 
     if (!this.createNewCheck) {
       // Report the annotation here and now
@@ -59,19 +59,19 @@ export class Reporter {
         title: annotation.title,
         file: annotation.path,
         startLine: annotation.start_line,
-        endLine: annotation.end_line,
-      };
+        endLine: annotation.end_line
+      }
 
       switch (annotation.annotation_level) {
-        case "notice":
-          core.notice(annotation.message, options);
-          break;
-        case "warning":
-          core.warning(annotation.message, options);
-          break;
-        case "failure":
-          core.error(annotation.message, options);
-          break;
+        case 'notice':
+          core.notice(annotation.message, options)
+          break
+        case 'warning':
+          core.warning(annotation.message, options)
+          break
+        case 'failure':
+          core.error(annotation.message, options)
+          break
       }
     }
   }
@@ -79,20 +79,13 @@ export class Reporter {
   async onFinish(client: ClientType): Promise<void> {
     if (!this.createNewCheck) {
       // Fail the Job if appropriate, and stop here
-      if (this.conclusion === "failure") {
-        core.setFailed("Failing due to grep results");
+      if (this.conclusion === 'failure') {
+        core.setFailed('Failing due to grep results')
       }
-      return;
+      return
     }
 
-    core.info(
-      `Creating Check result with ${this.annotations.length} annotation(s)`,
-    );
-    return await github.createCheck(
-      client,
-      "Grep results",
-      this.annotations,
-      this.conclusion,
-    );
+    core.info(`Creating Check result with ${this.annotations.length} annotation(s)`)
+    return await github.createCheck(client, 'Grep results', this.annotations, this.conclusion)
   }
 }

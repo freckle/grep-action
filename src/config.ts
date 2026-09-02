@@ -1,61 +1,58 @@
-import * as yaml from "js-yaml";
-import { Minimatch } from "minimatch";
+import * as yaml from 'js-yaml'
+import {Minimatch} from 'minimatch'
 
-import type { AnnotationLevel } from "./github.js"
-import type { GrepSyntax, GrepBinaryFiles } from "./grep.js"
+import type {AnnotationLevel} from './github.js'
+import type {GrepSyntax, GrepBinaryFiles} from './grep.js'
 
 export type Pattern = {
-  id: string | null;
-  pattern: string;
-  syntax: GrepSyntax;
-  binaryFiles: GrepBinaryFiles;
-  paths: string[];
-  pathsIgnore: string[];
-  level: AnnotationLevel;
-  title: string;
-  message: string | null;
-};
+  id: string | null
+  pattern: string
+  syntax: GrepSyntax
+  binaryFiles: GrepBinaryFiles
+  paths: string[]
+  pathsIgnore: string[]
+  level: AnnotationLevel
+  title: string
+  message: string | null
+}
 
 function fromPatternYaml(patternYaml: PatternYaml): Pattern {
-  const { id, pattern, syntax, paths, level, title, message } = patternYaml;
-  const pathsIgnore = patternYaml["paths-ignore"];
-  const binaryFiles = patternYaml["binary-files"];
+  const {id, pattern, syntax, paths, level, title, message} = patternYaml
+  const pathsIgnore = patternYaml['paths-ignore']
+  const binaryFiles = patternYaml['binary-files']
 
   return {
     id: id === undefined ? null : id,
     pattern,
-    syntax: syntax || "basic",
-    binaryFiles: binaryFiles || "binary",
-    paths: paths || ["**/*"],
+    syntax: syntax || 'basic',
+    binaryFiles: binaryFiles || 'binary',
+    paths: paths || ['**/*'],
     pathsIgnore: pathsIgnore || [],
-    level: level || "notice",
+    level: level || 'notice',
     title,
-    message: message === undefined ? null : message,
-  };
+    message: message === undefined ? null : message
+  }
 }
 
 type PatternYaml = {
-  id: string | null;
-  pattern: string;
-  syntax: GrepSyntax | null;
-  "binary-files": GrepBinaryFiles | null;
-  paths: string[] | null;
-  "paths-ignore": string[] | null;
-  level: AnnotationLevel | null;
-  title: string;
-  message: string | null;
-};
+  id: string | null
+  pattern: string
+  syntax: GrepSyntax | null
+  'binary-files': GrepBinaryFiles | null
+  paths: string[] | null
+  'paths-ignore': string[] | null
+  level: AnnotationLevel | null
+  title: string
+  message: string | null
+}
 
 export function loadPatterns(input: string): Pattern[] {
-  const patternsYaml = yaml.load(input) as PatternYaml[];
-  return patternsYaml.map(fromPatternYaml);
+  const patternsYaml = yaml.load(input) as PatternYaml[]
+  return patternsYaml.map(fromPatternYaml)
 }
 
 export function matchesAny(pattern: Pattern, file: string): boolean {
-  const keepMatchers = pattern.paths.map((p) => new Minimatch(p));
-  const discardMatchers = pattern.pathsIgnore.map((p) => new Minimatch(p));
-  return (
-    keepMatchers.some((m) => m.match(file)) &&
-    !discardMatchers.some((m) => m.match(file))
-  );
+  const keepMatchers = pattern.paths.map(p => new Minimatch(p))
+  const discardMatchers = pattern.pathsIgnore.map(p => new Minimatch(p))
+  return keepMatchers.some(m => m.match(file)) && !discardMatchers.some(m => m.match(file))
 }

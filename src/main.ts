@@ -1,109 +1,103 @@
-import { relative } from "path";
+import {relative} from 'path'
 
-import * as core from "@actions/core";
-import * as glob from "@actions/glob";
+import * as core from '@actions/core'
+import * as glob from '@actions/glob'
 
-import { Reporter } from "./reporter.js"
-import type { Pattern } from "./config.js"
-import * as config from "./config.js"
-import type { AnnotationLevel } from "./github.js"
-import * as github from "./github.js"
-import { grep } from "./grep.js"
+import {Reporter} from './reporter.js'
+import type {Pattern} from './config.js'
+import * as config from './config.js'
+import type {AnnotationLevel} from './github.js'
+import * as github from './github.js'
+import {grep} from './grep.js'
 
 async function getFiles(
   onlyChanged: boolean,
   changedFiles: string[],
-  pattern: Pattern,
+  pattern: Pattern
 ): Promise<string[]> {
   if (onlyChanged) {
-    return changedFiles.filter((file) => {
-      return config.matchesAny(pattern, file);
-    });
+    return changedFiles.filter(file => {
+      return config.matchesAny(pattern, file)
+    })
   } else {
-    const globber = await glob.create(pattern.paths.join("\n"));
-    const paths = await globber.glob();
+    const globber = await glob.create(pattern.paths.join('\n'))
+    const paths = await globber.glob()
     return paths
-      .map((p) => relative(process.cwd(), p))
-      .filter((file) => {
-        return config.matchesAny(pattern, file);
-      });
+      .map(p => relative(process.cwd(), p))
+      .filter(file => {
+        return config.matchesAny(pattern, file)
+      })
   }
 }
 
 async function run() {
   try {
-    core.startGroup("Inputs");
+    core.startGroup('Inputs')
 
-    const token = core.getInput("github-token", { required: true });
-    const patterns = config.loadPatterns(
-      core.getInput("patterns", { required: true }),
-    );
-    const onlyChanged = core.getBooleanInput("only-changed", {
-      required: true,
-    });
-    const createNewCheck = core.getBooleanInput("create-new-check", {
-      required: true,
-    });
-    const failureThreshold = core.getInput("failure-threshold", {
-      required: true,
-    }) as AnnotationLevel;
+    const token = core.getInput('github-token', {required: true})
+    const patterns = config.loadPatterns(core.getInput('patterns', {required: true}))
+    const onlyChanged = core.getBooleanInput('only-changed', {
+      required: true
+    })
+    const createNewCheck = core.getBooleanInput('create-new-check', {
+      required: true
+    })
+    const failureThreshold = core.getInput('failure-threshold', {
+      required: true
+    }) as AnnotationLevel
 
-    core.info(
-      `patterns: [${patterns.map((p) => p.pattern.toString()).join(", ")}]`,
-    );
-    core.info(`only-changed: ${onlyChanged}`);
-    core.endGroup();
+    core.info(`patterns: [${patterns.map(p => p.pattern.toString()).join(', ')}]`)
+    core.info(`only-changed: ${onlyChanged}`)
+    core.endGroup()
 
-    const client = github.getClient(token);
-    const changedFiles = onlyChanged
-      ? await github.listPullRequestFiles(client)
-      : [];
+    const client = github.getClient(token)
+    const changedFiles = onlyChanged ? await github.listPullRequestFiles(client) : []
 
     if (onlyChanged) {
       // Don't print "0 changed files" when we've disabled the option
-      core.info(`Fetched ${changedFiles.length} changed file(s)`);
+      core.info(`Fetched ${changedFiles.length} changed file(s)`)
     }
 
-    const reporter = new Reporter(createNewCheck, failureThreshold);
+    const reporter = new Reporter(createNewCheck, failureThreshold)
 
     for (const pattern of patterns) {
-      const files = await getFiles(onlyChanged, changedFiles, pattern);
+      const files = await getFiles(onlyChanged, changedFiles, pattern)
 
       if (files.length !== 0) {
-        core.startGroup(`grep "${pattern.pattern}"`);
+        core.startGroup(`grep "${pattern.pattern}"`)
         const results = await grep(pattern.pattern, files, {
           syntax: pattern.syntax,
-          binaryFiles: pattern.binaryFiles,
-        });
+          binaryFiles: pattern.binaryFiles
+        })
 
-        core.info(`${results.length} result(s)`);
+        core.info(`${results.length} result(s)`)
 
-        results.forEach((result) => {
-          reporter.onResult(pattern, result);
-        });
-        core.endGroup();
+        results.forEach(result => {
+          reporter.onResult(pattern, result)
+        })
+        core.endGroup()
 
         if (pattern.id) {
-          core.setOutput(pattern.id, results.length > 0 ? "true" : "false");
-          core.setOutput(`${pattern.id}_count`, results.length.toString());
-          core.setOutput(`${pattern.id}_results`, JSON.stringify(results));
+          core.setOutput(pattern.id, results.length > 0 ? 'true' : 'false')
+          core.setOutput(`${pattern.id}_count`, results.length.toString())
+          core.setOutput(`${pattern.id}_results`, JSON.stringify(results))
         }
       }
     }
 
-    reporter.onFinish(client);
+    reporter.onFinish(client)
   } catch (error) {
     if (error instanceof Error) {
-      core.error(error);
-      core.setFailed(error.message);
-    } else if (typeof error === "string") {
-      core.error(error);
-      core.setFailed(error);
+      core.error(error)
+      core.setFailed(error.message)
+    } else if (typeof error === 'string') {
+      core.error(error)
+      core.setFailed(error)
     } else {
-      core.error("Non-Error exception");
-      core.setFailed("Non-Error exception");
+      core.error('Non-Error exception')
+      core.setFailed('Non-Error exception')
     }
   }
 }
 
-run();
+run()

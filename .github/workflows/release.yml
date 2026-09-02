@@ -15,16 +15,26 @@ jobs:
         with:
           persist-credentials: false
 
+      # .releaserc.yaml's prepareCmd shells out to pnpm, so it must be on PATH
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with:
+          cache: pnpm
+          node-version-file: ".nvmrc"
+
       - id: token
         uses: actions/create-github-app-token@v3
         with:
           app-id: ${{ vars.FRECKLE_AUTOMATION_APP_ID }}
           private-key: ${{ secrets.FRECKLE_AUTOMATION_PRIVATE_KEY }}
 
-      - uses: cycjimmy/semantic-release-action@v6.0.0
+      - id: release
+        uses: cycjimmy/semantic-release-action@v6.0.0
+        # conventional-changelog-conventionalcommits is held at 9.x: v10 needs
+        # conventional-changelog-writer@9, which semantic-release@25 does not ship.
         with:
           extra_plugins: |
-            conventional-changelog-conventionalcommits
+            conventional-changelog-conventionalcommits@9
             @semantic-release/exec
             semantic-release-major-tag
         env:

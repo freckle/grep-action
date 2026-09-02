@@ -2,6 +2,8 @@ name: CI
 
 on:
   pull_request:
+  push:
+    branches: main
 
 permissions:
   contents: read
@@ -11,10 +13,43 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
       - uses: actions/setup-node@v7
         with:
-          cache: yarn
-          node-version-file: '.nvmrc'
-      - run: yarn install
-      - run: yarn build
-      - run: yarn test
+          cache: pnpm
+          node-version-file: ".nvmrc"
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm format-check
+      - run: pnpm typecheck
+      - run: pnpm lint
+      - run: pnpm knip
+      - run: pnpm coverage
+      - run: pnpm build
+      - uses: actions/upload-artifact@v7
+        with:
+          name: dist
+          path: dist/index.js
+
+  integration:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions: {}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/download-artifact@v8
+        with:
+          name: dist
+          path: dist # overwrite dist/index.js
+      # only-changed: false and create-new-check: false keep this to annotations
+      # only, so the job needs no token permissions
+      - uses: ./
+        with:
+          patterns: |
+            - pattern: "\\<export\\>"
+              syntax: basic
+              paths:
+                - "src/**/*.ts"
+              level: notice
+              title: "Integration smoke test"
+          only-changed: false
+          create-new-check: false

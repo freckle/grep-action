@@ -10,12 +10,6 @@ export function getClient(token: string): ClientType {
   return github.getOctokit(token);
 }
 
-export type Output = {
-  title: string;
-  summary: string;
-  annotations: Annotation[];
-};
-
 export type Annotation = {
   path: string;
   start_line: number;

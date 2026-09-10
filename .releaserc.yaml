@@ -1,7 +1,8 @@
 plugins:
   - - "@semantic-release/commit-analyzer"
     - preset: "conventionalcommits"
-  - "@semantic-release/release-notes-generator"
+  - - "@semantic-release/release-notes-generator"
+    - preset: "conventionalcommits"
   - - "@semantic-release/github"
     - successCommentCondition: false
 
@@ -9,7 +10,7 @@ plugins:
 
   # Update dist, in case Dependabot PRs merged without doing so
   - - "@semantic-release/exec"
-    - prepareCmd: "yarn install && yarn run build"
+    - prepareCmd: "pnpm install && pnpm run build"
 
   - - "@semantic-release/git"
     - assets: "dist/index.js"

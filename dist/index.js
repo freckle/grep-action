@@ -33425,7 +33425,7 @@ function internal_pattern_helper_partialMatch(patterns, itemPath) {
     return patterns.some(x => !x.negate && x.partialMatch(itemPath));
 }
 //# sourceMappingURL=internal-pattern-helper.js.map
-;// CONCATENATED MODULE: ./node_modules/@actions/glob/node_modules/balanced-match/dist/esm/index.js
+;// CONCATENATED MODULE: ./node_modules/balanced-match/dist/esm/index.js
 const balanced = (a, b, str) => {
     const ma = a instanceof RegExp ? maybeMatch(a, str) : a;
     const mb = b instanceof RegExp ? maybeMatch(b, str) : b;
@@ -40962,7 +40962,7 @@ class Reporter {
 }
 
 ;// CONCATENATED MODULE: ./node_modules/js-yaml/dist/js-yaml.mjs
-/*! js-yaml 5.4.1 https://github.com/nodeca/js-yaml @license MIT */
+/*! js-yaml 5.4.2 https://github.com/nodeca/js-yaml @license MIT */
 //#region src/tag.ts
 /**
 * Returned by a scalar resolver when the source does not match its tag.
@@ -43824,6 +43824,7 @@ function doubleQuoteWhitespaceOnly(layout) {
 function applyForceQuotesOption(layout) {
 	if (!layout.presenterOptions.forceQuotes) return;
 	if (layout.isKey || layout.style !== SCALAR_STYLE.PLAIN) return;
+	if (layout.node.tag !== layout.presenterOptions.schema.defaultScalarTag.tagName) return;
 	layout.style = layout.node.value.includes("\n") ? SCALAR_STYLE.DOUBLE_QUOTED : _preferredQuotedStyle(layout);
 }
 function tryLongOrMultilineAsBlock(layout) {
@@ -44560,61 +44561,6 @@ var CHOMPING_KEEP = CHOMPING_MODE.KEEP;
 
 
 //# sourceMappingURL=js-yaml.mjs.map
-;// CONCATENATED MODULE: ./node_modules/brace-expansion/node_modules/balanced-match/dist/esm/index.js
-const esm_balanced = (a, b, str) => {
-    const ma = a instanceof RegExp ? esm_maybeMatch(a, str) : a;
-    const mb = b instanceof RegExp ? esm_maybeMatch(b, str) : b;
-    const r = ma !== null && mb != null && esm_range(ma, mb, str);
-    return (r && {
-        start: r[0],
-        end: r[1],
-        pre: str.slice(0, r[0]),
-        body: str.slice(r[0] + ma.length, r[1]),
-        post: str.slice(r[1] + mb.length),
-    });
-};
-const esm_maybeMatch = (reg, str) => {
-    const m = str.match(reg);
-    return m ? m[0] : null;
-};
-const esm_range = (a, b, str) => {
-    let begs, beg, left, right = undefined, result;
-    let ai = str.indexOf(a);
-    let bi = str.indexOf(b, ai + 1);
-    let i = ai;
-    if (ai >= 0 && bi > 0) {
-        if (a === b) {
-            return [ai, bi];
-        }
-        begs = [];
-        left = str.length;
-        while (i >= 0 && !result) {
-            if (i === ai) {
-                begs.push(i);
-                ai = str.indexOf(a, i + 1);
-            }
-            else if (begs.length === 1) {
-                const r = begs.pop();
-                if (r !== undefined)
-                    result = [r, bi];
-            }
-            else {
-                beg = begs.pop();
-                if (beg !== undefined && beg < left) {
-                    left = beg;
-                    right = bi;
-                }
-                bi = str.indexOf(b, i + 1);
-            }
-            i = ai < bi && ai >= 0 ? ai : bi;
-        }
-        if (begs.length && right !== undefined) {
-            result = [left, right];
-        }
-    }
-    return result;
-};
-//# sourceMappingURL=index.js.map
 ;// CONCATENATED MODULE: ./node_modules/brace-expansion/dist/esm/index.js
 
 const esm_escSlash = '\0SLASH' + Math.random() + '\0';
@@ -44673,7 +44619,7 @@ function esm_parseCommaParts(str) {
         return [''];
     }
     const parts = [];
-    const m = esm_balanced('{', '}', str);
+    const m = balanced('{', '}', str);
     if (!m) {
         return str.split(',');
     }
@@ -44809,7 +44755,7 @@ function esm_expand_(str, max, maxLength, isTop) {
     let dropEmpties = false;
     let firstGroup = true;
     for (;;) {
-        const m = esm_balanced('{', '}', str);
+        const m = balanced('{', '}', str);
         // No brace set left: the rest of the string is literal.
         if (!m) {
             return combine(acc, str, [''], max, maxLength, dropEmpties);

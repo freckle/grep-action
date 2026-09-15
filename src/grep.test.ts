@@ -1,14 +1,19 @@
 import * as fs from 'fs'
 
-import type {GrepSyntax} from './grep.js'
+import type {GrepBinaryFiles, GrepSyntax} from './grep.js'
 import {grep, parseGrep} from './grep.js'
 
-async function grepLines(syntax: GrepSyntax, pattern: string, lines: string[]): Promise<number[]> {
+async function grepLines(
+  syntax: GrepSyntax,
+  pattern: string,
+  lines: string[],
+  binaryFiles: GrepBinaryFiles = 'binary'
+): Promise<number[]> {
   const file = '/tmp/grep-action-test-grep.txt'
   fs.writeFileSync(file, lines.join('\n'))
   const results = await grep(pattern, [file], {
     syntax,
-    binaryFiles: 'binary',
+    binaryFiles,
     silent: true
   })
   return results.map(r => r.line)
@@ -48,6 +53,21 @@ test('grep -P', async () => {
   const lines = await grepLines('perl', '[Ff]oo(?!bar)', ['Foobar', 'Foobaz', 'Foobar', 'foobat'])
 
   expect(lines).toEqual([2, 4])
+})
+
+test.for(['binary', 'without-match', 'text'] as GrepBinaryFiles[])(
+  'grep --binary-files=%s',
+  async binaryFiles => {
+    const lines = await grepLines('fixed', 'foo', ['Here is a foo', 'And a bar'], binaryFiles)
+
+    expect(lines).toEqual([1])
+  }
+)
+
+test('parseGrep discards lines without a path and line number', () => {
+  const results = parseGrep(['src/main.ts:1:hit', 'no line number here', ''].join('\n'))
+
+  expect(results).toEqual([{input: 'src/main.ts:1:hit', path: 'src/main.ts', line: 1}])
 })
 
 test('Matches path and column', () => {
